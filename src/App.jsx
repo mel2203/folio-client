@@ -4,18 +4,10 @@ import { ProtectedRoute, PublicOnlyRoute } from './components/ProtectedRoute.jsx
 import Accounts from './pages/Accounts.jsx'
 import JournalDetail from './pages/JournalDetail.jsx'
 import JournalList from './pages/JournalList.jsx'
+import JournalNew from './pages/JournalNew.jsx'
 import Login from './pages/Login.jsx'
 import NotFound from './pages/NotFound.jsx'
 import Register from './pages/Register.jsx'
-
-function RoutePlaceholder({ title }) {
-  return (
-    <section className="route-placeholder">
-      <h1>{title}</h1>
-      <p>This page will be added in a later stage.</p>
-    </section>
-  )
-}
 
 function App() {
   return (
@@ -29,7 +21,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Navigate to="/journal" replace />} />
             <Route path="/journal" element={<JournalList />} />
-            <Route path="/journal/new" element={<RoutePlaceholder title="New journal entry" />} />
+            <Route path="/journal/new" element={<JournalNew />} />
             <Route path="/journal/:id" element={<JournalDetail />} />
             <Route path="/accounts" element={<Accounts />} />
           </Route>

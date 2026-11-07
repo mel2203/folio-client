@@ -173,6 +173,15 @@
   padding: 18px 20px;
 }
 
+.journal-detail__success {
+  margin-bottom: 20px;
+  border-left: 4px solid var(--mint);
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: var(--white);
+  color: var(--navy);
+}
+
 .journal-detail-card--lines {
   margin-top: 24px;
 }

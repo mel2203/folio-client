@@ -15,3 +15,10 @@ export function listJournalEntries({ from, to, status, page, limit }) {
 export function getJournalEntry(id) {
   return request(`/api/journal-entries/${encodeURIComponent(id)}`)
 }
+
+export function createJournalEntry(entry) {
+  return request('/api/journal-entries', {
+    method: 'POST',
+    body: entry,
+  })
+}

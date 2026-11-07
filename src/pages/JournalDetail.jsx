@@ -28,6 +28,7 @@ function JournalDetail() {
   const { id } = useParams()
   const location = useLocation()
   const backTo = location.state?.from || '/journal'
+  const successMessage = location.state?.successMessage
   const [responseState, setResponseState] = useState(null)
   const currentResponse = responseState?.id === id ? responseState : null
   const isLoading = currentResponse === null
@@ -116,6 +117,11 @@ function JournalDetail() {
           {entry.status}
         </StatusChip>
       </header>
+      {successMessage && (
+        <p className="journal-detail__success" role="status" aria-live="polite">
+          {successMessage}
+        </p>
+      )}
 
       <section className="journal-detail-card" aria-labelledby="entry-memo-heading">
         <h2 id="entry-memo-heading">Memo</h2>
