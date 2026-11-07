@@ -1,0 +1,86 @@
+.accounts-page__header {
+  margin-bottom: 28px;
+}
+
+.accounts-page__header h1 {
+  margin: 0 0 8px;
+  font-size: 36px;
+}
+
+.accounts-page__header p {
+  color: var(--text-muted);
+}
+
+.accounts-groups {
+  display: grid;
+  gap: 24px;
+}
+
+.accounts-group {
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: var(--card-shadow);
+}
+
+.accounts-group h2 {
+  margin: 0;
+  border-bottom: 1px solid var(--rule);
+  padding: 16px 20px;
+  font-size: 24px;
+}
+
+.accounts-table-scroll {
+  overflow-x: auto;
+}
+
+.accounts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: left;
+}
+
+.accounts-table th,
+.accounts-table td {
+  border-bottom: 1px solid var(--rule);
+  padding: 14px 20px;
+}
+
+.accounts-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.accounts-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.accounts-table__row--inactive {
+  color: var(--text-muted);
+}
+
+.accounts-table__inactive-label {
+  font-size: 12px;
+}
+
+.accounts-state {
+  border-radius: 14px;
+  padding: 24px;
+  background: var(--white);
+  box-shadow: var(--card-shadow);
+}
+
+.accounts-state--error {
+  border-left: 4px solid var(--coral);
+}
+
+@media (max-width: 767px) {
+  .accounts-page__header h1 {
+    font-size: 32px;
+  }
+
+  .accounts-table {
+    min-width: 480px;
+  }
+}

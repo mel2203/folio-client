@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import { ProtectedRoute, PublicOnlyRoute } from './components/ProtectedRoute.jsx'
+import Accounts from './pages/Accounts.jsx'
 import Login from './pages/Login.jsx'
 import NotFound from './pages/NotFound.jsx'
 import Register from './pages/Register.jsx'
@@ -28,7 +29,7 @@ function App() {
             <Route path="/journal" element={<RoutePlaceholder title="Journal entries" />} />
             <Route path="/journal/new" element={<RoutePlaceholder title="New journal entry" />} />
             <Route path="/journal/:id" element={<RoutePlaceholder title="Journal entry" />} />
-            <Route path="/accounts" element={<RoutePlaceholder title="Chart of accounts" />} />
+            <Route path="/accounts" element={<Accounts />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
