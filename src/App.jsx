@@ -1,7 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import { ProtectedRoute, PublicOnlyRoute } from './components/ProtectedRoute.jsx'
+import Login from './pages/Login.jsx'
 import NotFound from './pages/NotFound.jsx'
+import Register from './pages/Register.jsx'
 
 function RoutePlaceholder({ title }) {
   return (
@@ -17,8 +19,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<PublicOnlyRoute />}>
-          <Route path="/login" element={<RoutePlaceholder title="Log in" />} />
-          <Route path="/register" element={<RoutePlaceholder title="Create your account" />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
