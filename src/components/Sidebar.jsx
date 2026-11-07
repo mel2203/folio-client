@@ -11,7 +11,6 @@ function Sidebar() {
         <NavLink
           className={({ isActive }) => `sidebar__link${isActive ? ' is-active' : ''}`}
           to="/journal"
-          end
         >
           Journal entries
         </NavLink>

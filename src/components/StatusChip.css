@@ -1,0 +1,26 @@
+.status-chip {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 99px;
+  padding: 4px 10px;
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.status-chip--positive {
+  background: var(--mint);
+}
+
+.status-chip--neutral {
+  background: var(--lilac);
+}
+
+.status-chip--error {
+  border-color: var(--coral);
+  background: var(--white);
+}
