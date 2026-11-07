@@ -1,0 +1,93 @@
+:root {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--navy);
+  background: var(--lilac);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-placeholder {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+}
+
+.logo {
+  display: inline-flex;
+  width: max-content;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.logo__word {
+  font-family: var(--font-heading);
+  font-size: 36px;
+  line-height: 1;
+}
+
+.logo__rule {
+  display: block;
+  width: 100%;
+  height: 2px;
+}
+
+.logo__rule--primary {
+  background: var(--navy);
+}
+
+.logo__rule--accent {
+  background: var(--coral);
+}
+
+.logo--dark .logo__word {
+  color: var(--white);
+}
+
+.logo--dark .logo__rule--primary {
+  background: var(--white);
+}
+
+.logo--dark .logo__rule--accent {
+  background: var(--sun);
+}

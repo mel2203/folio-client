@@ -1,0 +1,16 @@
+:root {
+  --navy: #140F3D;
+  --violet: #5B3DF5;
+  --coral: #FF6B4A;
+  --sun: #FFC93C;
+  --mint: #3DDBB0;
+  --lilac: #F3F0FF;
+  --white: #FFFFFF;
+  --text-on-dark: #E4E0FF;
+  --link-on-dark: #CFC8FF;
+  --text-muted: #3B3566;
+  --rule: #E4E0FF;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Instrument Serif', Georgia, serif;
+  --card-shadow: 0 1px 2px rgba(20, 15, 61, 0.06), 0 8px 24px rgba(20, 15, 61, 0.06);
+}
