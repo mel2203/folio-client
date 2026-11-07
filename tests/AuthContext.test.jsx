@@ -18,7 +18,7 @@ function jsonResponse(payload, status = 200) {
 }
 
 function AuthState() {
-  const { user, company, isAuthenticated, isLoading, register } = useAuth()
+  const { user, company, isAuthenticated, isLoading, authError, register } = useAuth()
   const [registerError, setRegisterError] = useState('')
 
   async function handleRegister() {
@@ -43,6 +43,7 @@ function AuthState() {
       <p>{isAuthenticated ? 'Authenticated' : 'Signed out'}</p>
       <p>{user?.fullName ?? 'Signed out'}</p>
       <p>{company?.name ?? 'No company'}</p>
+      {authError && <p role="alert">{authError.message}</p>}
       {registerError && <p>{registerError}</p>}
       <button type="button" onClick={handleRegister}>Register</button>
     </div>
@@ -56,9 +57,14 @@ afterEach(() => {
 })
 
 describe('AuthProvider', () => {
-  it('validates a saved token with the accounts endpoint without inventing a profile', async () => {
+  it('restores the user and company from the current-user endpoint', async () => {
     setAuthToken('session-token')
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: [] }))
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({
+      data: {
+        user: { fullName: 'Sample User' },
+        company: { name: 'Sample Company' },
+      },
+    }))
     vi.stubGlobal('fetch', fetchMock)
 
     render(
@@ -69,9 +75,10 @@ describe('AuthProvider', () => {
 
     expect(screen.getByText('Loading session')).toBeInTheDocument()
     expect(await screen.findByText('Authenticated')).toBeInTheDocument()
-    expect(screen.getByText('No company')).toBeInTheDocument()
+    expect(screen.getByText('Sample User')).toBeInTheDocument()
+    expect(screen.getByText('Sample Company')).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('/api/accounts'),
+      expect.stringContaining('/api/auth/me'),
       expect.any(Object),
     )
   })
@@ -84,7 +91,12 @@ describe('AuthProvider', () => {
       .mockResolvedValueOnce(jsonResponse({
         data: { token: 'new-session-token', user: { fullName: 'Sample User' } },
       }))
-      .mockResolvedValueOnce(jsonResponse({ data: [] }))
+      .mockResolvedValueOnce(jsonResponse({
+        data: {
+          user: { fullName: 'Sample User' },
+          company: { name: 'Sample Company' },
+        },
+      }))
     vi.stubGlobal('fetch', fetchMock)
 
     render(
@@ -101,7 +113,7 @@ describe('AuthProvider', () => {
       expect(screen.getByText('Authenticated')).toBeInTheDocument()
     })
 
-    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock).toHaveBeenCalledTimes(3)
     expect(getAuthToken()).toBe('new-session-token')
   })
 
@@ -125,5 +137,19 @@ describe('AuthProvider', () => {
 
     expect(await screen.findByText('No company')).toBeInTheDocument()
     expect(getAuthToken()).toBeNull()
+  })
+
+  it('surfaces a network error while restoring a saved session', async () => {
+    setAuthToken('session-token')
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')))
+
+    render(
+      <AuthProvider>
+        <AuthState />
+      </AuthProvider>,
+    )
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Cannot reach the server')
+    expect(getAuthToken()).toBe('session-token')
   })
 })

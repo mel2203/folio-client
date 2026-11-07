@@ -1,16 +1,61 @@
-# React + Vite
+# Folio frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Folio is a React single-page app for Malaysian small-business accounting. It connects to the Folio REST API; this repository contains frontend code only.
 
-Currently, two official plugins are available:
+## Requirements
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20.19+ or 22.12+
+- npm
+- The Folio backend running locally for registration, login, and live account/journal data
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+From this directory, install dependencies and create your local environment file:
 
-## Expanding the ESLint configuration
+```sh
+npm install
+cp .env.example .env
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Set `VITE_API_URL` in `.env` to the backend origin. The example uses:
+
+```dotenv
+VITE_API_URL=http://localhost:3000
+```
+
+Vite environment variables are included in the client bundle. Do not put secrets, passwords, or tokens in them. `.env` is ignored by Git; commit only `.env.example`.
+
+## Run the app
+
+Start the backend first, then run the frontend development server:
+
+```sh
+npm run dev
+```
+
+Vite prints the local client URL, usually `http://localhost:5173`.
+
+The backend must be configured to allow that client origin through CORS. For the backend's local configuration, set its `CLIENT_URL` to the exact frontend origin (for example, `http://localhost:5173`). If the client runs on another port, update the CORS allowlist accordingly.
+
+## Tests
+
+Run the Vitest and Testing Library suite:
+
+```sh
+npm test
+```
+
+Tests mock `fetch`; they do not require a running API or make real network requests.
+
+## Lint and production build
+
+```sh
+npm run lint
+npm run build
+```
+
+The production files are written to `dist/`. To preview that build locally:
+
+```sh
+npm run preview
+```

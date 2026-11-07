@@ -5,9 +5,9 @@ import {
   useState,
 } from 'react'
 import {
+  getCurrentUser,
   login as loginRequest,
   register as registerRequest,
-  validateSession,
 } from '../api/auth.js'
 import {
   AUTH_UNAUTHORIZED_EVENT,
@@ -33,13 +33,24 @@ export function AuthProvider({ children }) {
       return undefined
     }
 
-    validateSession()
-      .then(() => {
+    getCurrentUser()
+      .then((session) => {
         if (isMounted) {
+          if (!session?.user || !session?.company) {
+            throw new Error('The server returned an invalid session response.')
+          }
+
+          setUser(session.user)
+          setCompany(session.company)
           setIsAuthenticated(true)
+          setAuthError(null)
         }
-      }).catch((error) => {
+      })
+      .catch((error) => {
         if (isMounted) {
+          setUser(null)
+          setCompany(null)
+          setIsAuthenticated(false)
           if (error.status !== 401) {
             setAuthError(error)
           }
@@ -73,23 +84,38 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (credentials) => {
     const result = await loginRequest(credentials)
+    if (typeof result?.token !== 'string' || !result.token) {
+      throw new Error('The server returned an invalid login response.')
+    }
+
     setAuthToken(result.token)
-    setUser(result.user)
-    setCompany(null)
-    setIsAuthenticated(true)
-    setAuthError(null)
-    return result
+
+    try {
+      const session = await getCurrentUser()
+      if (!session?.user || !session?.company) {
+        throw new Error('The server returned an invalid session response.')
+      }
+
+      setUser(session.user)
+      setCompany(session.company)
+      setIsAuthenticated(true)
+      setAuthError(null)
+      return { ...result, user: session.user, company: session.company }
+    } catch (error) {
+      clearAuthToken()
+      setUser(null)
+      setCompany(null)
+      setIsAuthenticated(false)
+      throw error
+    }
   }, [])
 
   const register = useCallback(async (details) => {
-    const registration = await registerRequest(details)
-    const session = await login({
+    await registerRequest(details)
+    return login({
       email: details.email,
       password: details.password,
     })
-
-    setCompany(registration.company)
-    return { ...session, company: registration.company }
   }, [login])
 
   const logout = useCallback(() => {

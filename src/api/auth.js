@@ -14,6 +14,6 @@ export function register(details) {
   })
 }
 
-export function validateSession() {
-  return request('/api/accounts')
+export function getCurrentUser() {
+  return request('/api/auth/me')
 }

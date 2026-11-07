@@ -5,7 +5,7 @@ import { useAuth } from '../context/useAuth.js'
 import { getAuthServerError, getEmailError, getPasswordError } from './authValidation.js'
 
 function Login() {
-  const { login } = useAuth()
+  const { authError, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [values, setValues] = useState({ email: '', password: '' })
@@ -49,6 +49,11 @@ function Login() {
     <AuthPageLayout>
       <h1>Welcome back</h1>
       <p className="auth-form__intro">Log in to continue to Folio.</p>
+      {authError && !serverError && (
+        <p className="auth-form__server-error" role="alert" aria-live="polite">
+          Error: Unable to verify your saved session. {authError.message}
+        </p>
+      )}
       <form noValidate onSubmit={handleSubmit}>
         <div className="auth-form__fields">
           <div className="auth-form__field">
