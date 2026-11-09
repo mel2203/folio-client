@@ -27,5 +27,16 @@ export function formatMoney(cents) {
   const [whole, fraction] = unsignedAmount.split('.')
   const groupedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
-  return `RM ${isNegative ? '-' : ''}${groupedWhole}.${fraction}`
+  const formatted = `RM ${groupedWhole}.${fraction}`
+  return isNegative ? `(${formatted})` : formatted
+}
+
+export function formatMoneyString(amount) {
+  if (typeof amount !== 'string' || !/^-?\d+(?:\.\d{1,2})?$/.test(amount)) {
+    throw new TypeError('Money amounts must be decimal strings with at most two decimal places.')
+  }
+  const isNegative = amount.startsWith('-')
+  const unsignedAmount = isNegative ? amount.slice(1) : amount
+  const cents = parseAmountToCents(unsignedAmount)
+  return formatMoney(isNegative ? -cents : cents)
 }

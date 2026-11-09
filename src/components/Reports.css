@@ -1,0 +1,129 @@
+.reports-subnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.reports-subnav__links {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.reports-subnav__links a {
+  flex: 0 0 auto;
+  border-bottom: 3px solid transparent;
+  padding: 12px 14px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.reports-subnav__links a:hover,
+.reports-subnav__links a[aria-current='page'] {
+  color: var(--navy);
+}
+
+.reports-subnav__links a[aria-current='page'] {
+  border-bottom-color: var(--violet);
+}
+
+.reports-print-button {
+  min-height: 40px;
+  flex: 0 0 auto;
+  border: 1.5px solid var(--navy);
+  border-radius: 99px;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--navy);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.reports-print-button:hover {
+  background: var(--lilac);
+}
+
+.reports-print-header {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 18mm;
+  }
+
+  body,
+  #root {
+    min-width: 0;
+    min-height: 0;
+    background: var(--white);
+    color: var(--navy);
+  }
+
+  .sidebar,
+  .topbar,
+  .reports-subnav,
+  .trial-balance-page__header,
+  .income-statement-page__header,
+  .balance-sheet-page__header {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block;
+    min-height: 0;
+  }
+
+  .page-content {
+    padding: 0;
+  }
+
+  .reports-print-header {
+    display: block;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #777;
+    padding-bottom: 12px;
+  }
+
+  .reports-print-header p {
+    margin: 0 0 4px;
+  }
+
+  .reports-print-header h1 {
+    margin: 4px 0;
+    font-size: 28px;
+  }
+
+  .trial-balance-card,
+  .income-statement-card,
+  .balance-sheet-card,
+  .trial-balance-state,
+  .income-statement-state,
+  .balance-sheet-state {
+    box-shadow: none;
+  }
+
+  .trial-balance-table,
+  .income-statement-table,
+  .balance-sheet-table {
+    break-inside: avoid;
+  }
+
+  tr,
+  .income-statement-section,
+  .balance-sheet-section {
+    break-inside: avoid;
+  }
+
+  .trial-balance-table__grand-total th,
+  .trial-balance-table__grand-total td,
+  .income-statement-grand-total,
+  .balance-sheet-grand-total {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

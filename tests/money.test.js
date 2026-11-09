@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   centsToAmount,
   formatMoney,
+  formatMoneyString,
   parseAmountToCents,
 } from '../src/utils/money.js'
 
@@ -14,6 +15,9 @@ describe('money helpers', () => {
   it('formats amounts with RM and thousands separators', () => {
     expect(formatMoney(135680n)).toBe('RM 1,356.80')
     expect(formatMoney(99n)).toBe('RM 0.99')
+    expect(formatMoney(-12000n)).toBe('(RM 120.00)')
+    expect(formatMoney(-123456789n)).toBe('(RM 1,234,567.89)')
+    expect(formatMoneyString('-1234567.89')).toBe('(RM 1,234,567.89)')
   })
 
   it('adds awkward decimal amounts exactly in cents', () => {

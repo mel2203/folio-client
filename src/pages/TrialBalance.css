@@ -1,0 +1,114 @@
+.trial-balance-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.trial-balance-page__header h1 {
+  margin: 0 0 8px;
+  font-size: 36px;
+}
+
+.trial-balance-page__header p {
+  color: var(--text-muted);
+}
+
+.trial-balance-page__control {
+  display: grid;
+  min-width: 190px;
+  gap: 8px;
+}
+
+.trial-balance-page__control label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.trial-balance-page__control input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--white);
+  color: var(--navy);
+}
+
+.trial-balance-page__status {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.trial-balance-card,
+.trial-balance-state {
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: var(--card-shadow);
+}
+
+.trial-balance-state {
+  padding: 24px;
+}
+
+.trial-balance-state--error {
+  border-left: 4px solid var(--coral);
+}
+
+.trial-balance-table-scroll {
+  overflow-x: auto;
+}
+
+.trial-balance-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: left;
+}
+
+.trial-balance-table th,
+.trial-balance-table td {
+  border-bottom: 1px solid var(--rule);
+  padding: 14px 20px;
+}
+
+.trial-balance-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.trial-balance-table__money {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.trial-balance-table__grand-total th,
+.trial-balance-table__grand-total td {
+  border-top: 3px double var(--navy);
+  border-bottom: 3px double var(--navy);
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 640px) {
+  .trial-balance-page__header {
+    flex-direction: column;
+  }
+
+  .trial-balance-page__control {
+    width: 100%;
+  }
+}

@@ -16,6 +16,12 @@ function Sidebar() {
         </NavLink>
         <NavLink
           className={({ isActive }) => `sidebar__link${isActive ? ' is-active' : ''}`}
+          to="/reports"
+        >
+          Reports
+        </NavLink>
+        <NavLink
+          className={({ isActive }) => `sidebar__link${isActive ? ' is-active' : ''}`}
           to="/accounts"
         >
           Chart of accounts

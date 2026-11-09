@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { listJournalEntries } from '../api/journal.js'
 import Pagination from '../components/Pagination.jsx'
 import StatusChip from '../components/StatusChip.jsx'
+import { formatCalendarDate } from '../utils/calendar-date.js'
 import './Journal.css'
 
 const PAGE_SIZE = 20
@@ -11,15 +12,6 @@ const VALID_STATUSES = new Set(['posted', 'void'])
 function readPage(value) {
   const page = Number(value)
   return Number.isInteger(page) && page > 0 ? page : 1
-}
-
-function formatDate(value) {
-  const [year, month, day] = value.split('-').map(Number)
-  return new Date(year, month - 1, day).toLocaleDateString('en-MY', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
 }
 
 function JournalList() {
@@ -212,7 +204,7 @@ function JournalList() {
                     }}
                   >
                     <td>
-                      <time dateTime={entry.entry_date}>{formatDate(entry.entry_date)}</time>
+                      <time dateTime={entry.entry_date}>{formatCalendarDate(entry.entry_date)}</time>
                     </td>
                     <td>{entry.memo || 'No memo'}</td>
                     <td>

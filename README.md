@@ -59,3 +59,15 @@ The production files are written to `dist/`. To preview that build locally:
 ```sh
 npm run preview
 ```
+
+## Reports
+
+The authenticated app includes three live reports calculated from posted journal entries for the current company:
+
+- **Trial Balance** at `/reports/trial-balance`: debit and credit balances by account, totals, and a balance status.
+- **Profit and Loss** at `/reports/income-statement`: revenue, expenses, and net income or loss for an inclusive date range.
+- **Balance Sheet** at `/reports/balance-sheet`: assets, liabilities, equity, and current earnings through the selected date.
+
+Open **Reports** in the sidebar to switch between the three reports. Visiting `/reports` opens Trial Balance. Date selections are kept in the URL: Trial Balance and Balance Sheet use `asOf=YYYY-MM-DD`; Profit and Loss uses `from=YYYY-MM-DD&to=YYYY-MM-DD`. Default dates use Kuala Lumpur time. Displayed report dates use `dd/mm/yyyy`.
+
+Each report includes loading, empty, and error states. Use **Print** to open the browser's print dialog; the printed report includes the company name, report title, and selected date or period.
