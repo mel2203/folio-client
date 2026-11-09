@@ -3,16 +3,8 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { getJournalEntry } from '../api/journal.js'
 import StatusChip from '../components/StatusChip.jsx'
 import { formatMoney, parseAmountToCents } from '../utils/money.js'
+import { formatCalendarDate } from '../utils/calendar-date.js'
 import './Journal.css'
-
-function formatDate(value) {
-  const [year, month, day] = value.split('-').map(Number)
-  return new Date(year, month - 1, day).toLocaleDateString('en-MY', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
 
 function calculateTotals(lines) {
   return lines.reduce(
@@ -111,7 +103,7 @@ function JournalDetail() {
       <header className="journal-detail__header">
         <div>
           <h1>Journal entry</h1>
-          <p><time dateTime={entry.entry_date}>{formatDate(entry.entry_date)}</time></p>
+          <p><time dateTime={entry.entry_date}>{formatCalendarDate(entry.entry_date)}</time></p>
         </div>
         <StatusChip tone={entry.status === 'posted' ? 'positive' : 'error'}>
           {entry.status}

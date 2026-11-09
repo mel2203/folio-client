@@ -1,0 +1,136 @@
+.balance-sheet-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.balance-sheet-page__header h1 {
+  margin: 0 0 8px;
+  font-size: 36px;
+}
+
+.balance-sheet-page__header p {
+  color: var(--text-muted);
+}
+
+.balance-sheet-page__control {
+  display: grid;
+  min-width: 190px;
+  gap: 8px;
+}
+
+.balance-sheet-page__control label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.balance-sheet-page__control input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--white);
+  color: var(--navy);
+}
+
+.balance-sheet-page__status {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.balance-sheet-card,
+.balance-sheet-state {
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: var(--card-shadow);
+}
+
+.balance-sheet-card {
+  padding: 24px;
+}
+
+.balance-sheet-section + .balance-sheet-section {
+  margin-top: 28px;
+}
+
+.balance-sheet-section h2 {
+  margin: 0 0 12px;
+  font-size: 25px;
+}
+
+.balance-sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.balance-sheet-table td {
+  padding: 11px 8px;
+}
+
+.balance-sheet-table__code {
+  display: inline-block;
+  min-width: 64px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.balance-sheet-table__money {
+  width: 180px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.balance-sheet-section__empty {
+  color: var(--text-muted);
+}
+
+.balance-sheet-section__total,
+.balance-sheet-section__current-earnings {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 8px;
+}
+
+.balance-sheet-section__total {
+  border-top: 1px solid var(--navy);
+  font-weight: 700;
+}
+
+.balance-sheet-section__current-earnings {
+  border-top: 1px solid var(--rule);
+}
+
+.balance-sheet-grand-total {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 20px;
+  margin-top: 28px;
+  border-top: 3px double var(--navy);
+  border-bottom: 3px double var(--navy);
+  padding: 14px 8px;
+  font-weight: 700;
+}
+
+.balance-sheet-state {
+  padding: 24px;
+}
+
+.balance-sheet-state--error {
+  border-left: 4px solid var(--coral);
+}
+
+@media (max-width: 640px) {
+  .balance-sheet-page__header {
+    flex-direction: column;
+  }
+
+  .balance-sheet-page__control {
+    width: 100%;
+  }
+}
