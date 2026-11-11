@@ -36,7 +36,7 @@ function Login() {
     setServerError('')
     try {
       await login(values)
-      const destination = location.state?.from?.pathname || '/journal'
+      const destination = location.state?.from?.pathname || '/dashboard'
       navigate(destination, { replace: true, state: { loginSuccess: true } })
     } catch (error) {
       setServerError(getAuthServerError(error, 'log in'))

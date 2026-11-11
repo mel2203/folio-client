@@ -32,7 +32,7 @@ export function PublicOnlyRoute() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/journal" replace />
+    return <Navigate to="/dashboard" replace />
   }
 
   return <Outlet />

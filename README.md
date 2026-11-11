@@ -37,6 +37,27 @@ Vite prints the local client URL, usually `http://localhost:5173`.
 
 The backend must be configured to allow that client origin through CORS. For the backend's local configuration, set its `CLIENT_URL` to the exact frontend origin (for example, `http://localhost:5173`). If the client runs on another port, update the CORS allowlist accordingly.
 
+## Features
+
+- Dashboard at `/dashboard` with cash, receivables, payables, and current-month net income; a six-month revenue-versus-expenses chart; top expenses and customers; and overdue invoice links.
+- Journal entries and chart of accounts.
+- Customer, invoice, vendor, and bill workflows backed by the API.
+- Trial Balance, Profit and Loss, Balance Sheet, A/R Aging, and A/P Aging reports.
+- Responsive layouts, loading and error feedback, toast messages, a top-level error boundary, keyboard focus styles, page-specific browser titles, and a folded-page favicon.
+
+The dashboard uses the backend's `GET /api/dashboard/summary` response for its summary figures. The backend defaults `asOf` to today in Kuala Lumpur; its optional `asOf=YYYY-MM-DD` query is available through the API client but is not exposed as a dashboard control. The overdue list combines the summary totals with records from the existing paginated invoice API; it does not add a backend endpoint or change accounting totals on the client.
+
+## Screenshots
+
+- Dashboard: _Screenshot placeholder — add after deployment._
+- Invoices: _Screenshot placeholder — add after deployment._
+- Reports: _Screenshot placeholder — add after deployment._
+
+## Live links
+
+- Frontend: Not published.
+- Backend API: Not published.
+
 ## Tests
 
 Run the Vitest and Testing Library suite:
@@ -84,3 +105,11 @@ The authenticated app includes customer and invoice workflows backed by the Sale
 Invoice dates are plain calendar dates and display as `dd/mm/yyyy`. The form previews rounded amounts using integer cents; the backend returns the official totals after saving. Use **Print** on an invoice detail page for a printable copy with company name, invoice number, issue date, and due date. Browser print styles hide the app navigation and action controls.
 
 Customer and invoice pages show loading, empty, and error states. Sales API functions use the shared request wrapper in `src/api/client.js`.
+
+## Accounting design
+
+- **Double entry:** invoices, payments, bills, and manual journal entries use the backend posting services, which validate balanced debits and credits.
+- **Immutability and reversals:** posted journal entries are not edited in the client. Corrections use server-side reversing entries.
+- **System roles:** accounting workflows use the server's designated cash, receivable, payable, and tax accounts rather than assuming account codes.
+- **Cents arithmetic:** money from the API remains decimal strings. The client formats money using integer cents in `src/utils/money.js`; dashboard report totals come directly from the server.
+- **Tenant isolation:** the frontend does not choose a company identifier for business requests. The authenticated server determines and scopes the company.
