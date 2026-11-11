@@ -6,6 +6,7 @@ const REPORT_TITLES = {
   '/reports/trial-balance': 'Trial Balance',
   '/reports/income-statement': 'Profit and Loss',
   '/reports/balance-sheet': 'Balance Sheet',
+  '/reports/ar-aging': 'Accounts Receivable Aging',
 }
 
 function ReportsPrintHeader() {

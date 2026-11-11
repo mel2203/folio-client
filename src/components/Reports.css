@@ -73,6 +73,10 @@
     display: none !important;
   }
 
+  .ar-aging-page__header {
+    display: none !important;
+  }
+
   .app-shell {
     display: block;
     min-height: 0;

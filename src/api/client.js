@@ -57,6 +57,8 @@ export async function request(path, { method = 'GET', body, headers = {} } = {})
     window.dispatchEvent(new Event(AUTH_UNAUTHORIZED_EVENT))
   }
 
+  if (response.status === 204) return undefined
+
   let payload
   try {
     payload = await response.json()

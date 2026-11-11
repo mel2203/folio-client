@@ -50,6 +50,12 @@ describe('API client', () => {
     await expect(request('/api/accounts')).resolves.toEqual({ id: 'account-1' })
   })
 
+  it('accepts successful 204 responses with no response body', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 204, json: vi.fn() }))
+
+    await expect(request('/api/invoices/invoice-1', { method: 'DELETE' })).resolves.toBeUndefined()
+  })
+
   it('converts an API error body into an ApiError', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
       jsonResponse({

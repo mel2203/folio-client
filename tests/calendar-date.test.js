@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   formatCalendarDate,
+  addCalendarDays,
   getFirstDayOfMonth,
   getTodayCalendarDate,
 } from '../src/utils/calendar-date.js'
@@ -26,5 +27,10 @@ describe('report date defaults', () => {
 
   it('gets the first day of the selected month without parsing through a timezone', () => {
     expect(getFirstDayOfMonth('2026-11-08')).toBe('2026-11-01')
+  })
+
+  it('adds due-date terms as calendar days', () => {
+    expect(addCalendarDays('2026-11-30', 30)).toBe('2026-12-30')
+    expect(addCalendarDays('2024-02-28', 1)).toBe('2024-02-29')
   })
 })
