@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from '../src/App.jsx'
 import { AuthContext } from '../src/context/authContext.js'
+import { formatCalendarDate, getFirstDayOfMonth, getTodayCalendarDate } from '../src/utils/calendar-date.js'
 
 function responseFor(url) {
   let data
@@ -73,7 +74,9 @@ describe('report navigation and print controls', () => {
     expect(screen.getByRole('link', { name: 'Profit and Loss' })).toHaveAttribute('aria-current', 'page')
     const printHeader = document.querySelector('.reports-print-header')
     expect(printHeader).toHaveTextContent('Example Company')
-    expect(printHeader).toHaveTextContent('Period: 01/11/2026 – 09/11/2026')
+    const today = getTodayCalendarDate()
+    const expectedPeriod = `Period: ${formatCalendarDate(getFirstDayOfMonth(today))} – ${formatCalendarDate(today)}`
+    expect(printHeader).toHaveTextContent(expectedPeriod)
 
     fireEvent.click(screen.getByRole('button', { name: 'Print' }))
     expect(printMock).toHaveBeenCalledOnce()
