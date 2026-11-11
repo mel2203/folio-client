@@ -20,3 +20,7 @@ export function getIncomeStatement({ from, to } = {}) {
 export function getBalanceSheet({ asOf } = {}) {
   return request(withQuery('/api/reports/balance-sheet', { asOf }))
 }
+
+export function getArAging({ asOf } = {}) {
+  return request(withQuery('/api/reports/ar-aging', { asOf }))
+}

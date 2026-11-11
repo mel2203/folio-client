@@ -1,13 +1,13 @@
 import './Pagination.css'
 
-function Pagination({ page, limit, total, onPageChange }) {
+function Pagination({ page, limit, total, onPageChange, ariaLabel = 'Journal entries pagination' }) {
   const start = total === 0 ? 0 : (page - 1) * limit + 1
   const end = Math.min(page * limit, total)
   const hasPrevious = page > 1
   const hasNext = end < total
 
   return (
-    <nav className="pagination" aria-label="Journal entries pagination">
+    <nav className="pagination" aria-label={ariaLabel}>
       <p className="pagination__range">
         Showing {start}-{end} of {total}
       </p>

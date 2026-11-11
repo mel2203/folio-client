@@ -71,3 +71,16 @@ The authenticated app includes three live reports calculated from posted journal
 Open **Reports** in the sidebar to switch between the three reports. Visiting `/reports` opens Trial Balance. Date selections are kept in the URL: Trial Balance and Balance Sheet use `asOf=YYYY-MM-DD`; Profit and Loss uses `from=YYYY-MM-DD&to=YYYY-MM-DD`. Default dates use Kuala Lumpur time. Displayed report dates use `dd/mm/yyyy`.
 
 Each report includes loading, empty, and error states. Use **Print** to open the browser's print dialog; the printed report includes the company name, report title, and selected date or period.
+
+## Sales
+
+The authenticated app includes customer and invoice workflows backed by the Sales API:
+
+- **Customers** at `/customers`: search, filter active or inactive customers, page through results, add or edit details and payment terms, and deactivate or reactivate with confirmation.
+- **Invoices** at `/invoices`: filter by status, customer, issue-date range, and invoice number. Create drafts at `/invoices/new`; invoice detail pages show server-calculated totals, payments, and links to their journal entries.
+- **Draft invoice editing** is available at `/invoices/:id/edit`. Drafts can be saved or deleted. Sending, payment recording, and voiding are available on the invoice detail page when the server status permits them.
+- **A/R Aging** at `/reports/ar-aging`: view customer balances in overdue buckets and compare the aging total with the Accounts Receivable ledger. Its `asOf=YYYY-MM-DD` date is stored in the URL.
+
+Invoice dates are plain calendar dates and display as `dd/mm/yyyy`. The form previews rounded amounts using integer cents; the backend returns the official totals after saving. Use **Print** on an invoice detail page for a printable copy with company name, invoice number, issue date, and due date. Browser print styles hide the app navigation and action controls.
+
+Customer and invoice pages show loading, empty, and error states. Sales API functions use the shared request wrapper in `src/api/client.js`.
