@@ -1,4 +1,8 @@
 .accounts-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
   margin-bottom: 28px;
 }
 
@@ -9,6 +13,65 @@
 
 .accounts-page__header p {
   color: var(--text-muted);
+}
+
+.accounts-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.accounts-toolbar select,
+.accounts-form input,
+.accounts-form select {
+  min-height: 44px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: var(--white);
+  color: var(--navy);
+}
+
+.accounts-toolbar select:focus,
+.accounts-form input:focus,
+.accounts-form select:focus {
+  border-color: var(--violet);
+  outline: 2px solid rgba(91, 61, 245, 0.16);
+}
+
+.accounts-primary-button,
+.accounts-secondary-button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accounts-primary-button {
+  background: var(--violet);
+  color: var(--white);
+}
+
+.accounts-primary-button:hover:not(:disabled) {
+  background: var(--navy);
+}
+
+.accounts-secondary-button {
+  border: 1px solid var(--rule);
+  background: var(--white);
+  color: var(--navy);
+}
+
+.accounts-primary-button:disabled,
+.accounts-secondary-button:disabled,
+.accounts-text-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .accounts-groups {
@@ -45,6 +108,7 @@
 .accounts-table td {
   border-bottom: 1px solid var(--rule);
   padding: 14px 20px;
+  vertical-align: middle;
 }
 
 .accounts-table th {
@@ -64,6 +128,38 @@
   font-size: 12px;
 }
 
+.accounts-system-badge {
+  display: inline-block;
+  margin-left: 8px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--lilac);
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.accounts-table__actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.accounts-text-button {
+  border: 0;
+  padding: 4px 7px;
+  background: transparent;
+  color: var(--violet);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accounts-text-button:hover:not(:disabled) {
+  color: var(--navy);
+  text-decoration: underline;
+}
+
 .accounts-state {
   border-radius: 14px;
   padding: 24px;
@@ -75,12 +171,124 @@
   border-left: 4px solid var(--coral);
 }
 
+.accounts-dialog-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 24px;
+  background: rgba(20, 15, 61, 0.42);
+}
+
+.accounts-dialog {
+  width: min(100%, 560px);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  border-radius: 18px;
+  padding: 24px;
+  background: var(--white);
+  box-shadow: 0 20px 70px rgba(20, 15, 61, 0.22);
+}
+
+.accounts-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.accounts-dialog__header h2 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.accounts-form {
+  display: grid;
+  gap: 16px;
+}
+
+.accounts-form__field {
+  display: grid;
+  gap: 7px;
+}
+
+.accounts-form__field label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.accounts-form__field input,
+.accounts-form__field select {
+  width: 100%;
+}
+
+.accounts-form__field [aria-invalid='true'] {
+  border-color: var(--coral);
+}
+
+.accounts-form__field-error {
+  color: var(--navy);
+  font-size: 12px;
+}
+
+.accounts-form__server-error {
+  border-left: 4px solid var(--coral);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: var(--lilac);
+  color: var(--navy);
+}
+
+.accounts-form__server-error p {
+  margin: 0;
+}
+
+.accounts-form__server-error ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.accounts-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.accounts-page .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
 @media (max-width: 767px) {
   .accounts-page__header h1 {
     font-size: 32px;
   }
 
+  .accounts-page__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .accounts-table {
-    min-width: 480px;
+    min-width: 760px;
+  }
+
+  .accounts-dialog-backdrop {
+    place-items: start center;
+    padding: 12px;
+  }
+
+  .accounts-dialog {
+    max-height: calc(100vh - 24px);
+    padding: 18px;
   }
 }

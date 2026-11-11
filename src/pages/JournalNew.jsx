@@ -305,7 +305,7 @@ function JournalNew() {
                         <option value="">Select an account</option>
                         {ACCOUNT_TYPES.map(({ value, label }) => {
                           const typeAccounts = accounts.filter(
-                            (account) => account.type === value && account.is_active,
+                            (account) => account.type === value && account.isActive,
                           )
                           if (typeAccounts.length === 0) {
                             return null
