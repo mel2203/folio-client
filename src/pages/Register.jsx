@@ -44,7 +44,7 @@ function Register() {
     setServerError('')
     try {
       await register(values)
-      navigate('/journal', { replace: true, state: { registrationSuccess: true } })
+      navigate('/dashboard', { replace: true, state: { registrationSuccess: true } })
     } catch (error) {
       setServerError(getAuthServerError(error, 'create your account'))
     } finally {

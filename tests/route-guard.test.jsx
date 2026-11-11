@@ -48,6 +48,6 @@ describe('route guards', () => {
   it('redirects an authenticated visitor away from public auth pages', () => {
     renderRoutes('/login', { isAuthenticated: true })
 
-    expect(screen.getByText('Current route: /journal')).toBeInTheDocument()
+    expect(screen.getByText('Current route: /dashboard')).toBeInTheDocument()
   })
 })

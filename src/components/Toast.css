@@ -1,0 +1,44 @@
+.app-toast {
+  position: fixed;
+  z-index: 20;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  max-width: min(440px, calc(100vw - 32px));
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--mint);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--white);
+  box-shadow: var(--card-shadow);
+  color: var(--navy);
+  font-size: 14px;
+}
+
+.app-toast--error {
+  border-left-color: var(--coral);
+}
+
+.app-toast button {
+  flex: 0 0 auto;
+  border: 0;
+  padding: 4px;
+  background: transparent;
+  color: var(--navy);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .app-toast {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    max-width: none;
+  }
+}
