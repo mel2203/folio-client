@@ -1,136 +1,144 @@
 .income-statement-page__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
-.income-statement-page__header h1 {
-  margin: 0 0 8px;
-  font-size: 36px;
-}
-
-.income-statement-page__header p {
-  color: var(--text-muted);
+  margin-bottom: 20px;
 }
 
 .income-statement-page__controls {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .income-statement-page__controls > div {
   display: grid;
-  min-width: 160px;
-  gap: 8px;
+  min-width: 150px;
+  gap: 6px;
 }
 
 .income-statement-page__controls label {
-  font-size: 13px;
-  font-weight: 600;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
 }
 
-.income-statement-page__controls input {
+.income-statement-page__controls .field {
   width: 100%;
-  min-height: 42px;
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 8px 10px;
-  background: var(--white);
-  color: var(--navy);
 }
 
 .income-statement-card,
 .income-statement-state {
-  border-radius: 14px;
-  background: var(--white);
-  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
 }
 
 .income-statement-card {
-  padding: 24px;
+  max-width: 780px;
 }
 
 .income-statement-section + .income-statement-section {
   margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
 }
 
 .income-statement-section h2 {
-  margin: 0 0 12px;
-  font-size: 25px;
+  margin: 0 0 10px;
+  font-size: 24px;
 }
 
 .income-statement-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
 }
 
 .income-statement-table td,
 .income-statement-table th {
-  padding: 12px 8px;
+  padding: 9px 10px;
+}
+
+.income-statement-table td:first-child {
+  border-bottom: 1px dashed var(--border);
 }
 
 .income-statement-table__code {
   display: inline-block;
-  min-width: 64px;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
+  min-width: 58px;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 12px;
 }
 
 .income-statement-table__money {
   width: 180px;
   text-align: right;
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.income-statement-table__subtotal th,
-.income-statement-table__subtotal td {
-  border-top: 1px solid var(--navy);
-  font-weight: 700;
+.income-statement-table tfoot th,
+.income-statement-table tfoot td {
+  border-top: 1px solid var(--foreground);
+  font-weight: 600;
 }
 
 .income-statement-section__empty,
 .income-statement-period {
-  color: var(--text-muted);
+  color: var(--muted-foreground);
 }
 
 .income-statement-section__total {
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid var(--navy);
-  padding: 12px 8px;
-  font-weight: 700;
+  border-top: 1px solid var(--foreground);
+  padding: 10px;
+  font-weight: 600;
 }
 
 .income-statement-grand-total {
   display: flex;
   justify-content: space-between;
-  margin-top: 28px;
-  border-top: 3px double var(--navy);
-  border-bottom: 3px double var(--navy);
-  padding: 14px 8px;
-  font-size: 18px;
-  font-weight: 700;
+  gap: 12px;
+  margin-top: 24px;
+  border-top: 1px solid var(--foreground);
+  border-bottom: 3px double var(--foreground);
+  padding: 14px 10px;
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.income-statement-grand-total strong {
+  font-size: 20px;
+  font-weight: 500;
 }
 
 .income-statement-state {
-  padding: 24px;
+  padding: 20px;
 }
 
 .income-statement-state--error {
-  border-left: 4px solid var(--coral);
+  border-left: 4px solid var(--destructive);
+  color: var(--foreground);
+}
+
+.income-statement-page .text-success-text {
+  color: var(--success-text);
+}
+
+.income-statement-page .text-destructive-text {
+  color: var(--destructive-text);
 }
 
 @media (max-width: 720px) {
-  .income-statement-page__header {
-    flex-direction: column;
-  }
-
   .income-statement-page__controls {
     width: 100%;
-    flex-direction: column;
+  }
+
+  .income-statement-page__controls > div {
+    min-width: 0;
+    flex: 1 1 140px;
+  }
+
+  .income-statement-grand-total {
+    font-size: 24px;
   }
 }

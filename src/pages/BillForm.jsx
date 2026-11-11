@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import PageHeader from '../components/PageHeader.jsx'
+import LoadingState from '../components/LoadingState.jsx'
 import { getAccounts } from '../api/accounts.js'
 import { createBill, getBill, listVendors, updateBill } from '../api/purchases.js'
 import { addCalendarDays, getTodayCalendarDate } from '../utils/calendar-date.js'
@@ -81,23 +83,25 @@ function BillForm() {
     } catch (error) { setServerError(error.message || 'Unable to save the bill.') } finally { setSaving(false) }
   }
 
-  if (initializing) return <p className="sales-state" role="status">Loading bill form...</p>
+  if (initializing) return <LoadingState label="Loading bill form..." className="sales-state" />
   if (serverError && !vendors.length && !accounts.length) return <p className="sales-state sales-state--error" role="alert">Error: {serverError}</p>
   return <section className="sales-form-page">
-    <header className="sales-form-page__header"><div><h1>{editing ? 'Edit draft bill' : 'New bill'}</h1><p>Enter the vendor bill details and item expenses.</p></div><Link className="sales-link" to="/bills">Back to bills</Link></header>
+    <PageHeader title={editing ? 'Edit draft bill' : 'New bill'} sub="Enter the vendor bill details and item expenses.">
+      <Link className="sales-link" to="/bills">Back to bills</Link>
+    </PageHeader>
     <form className="invoice-form-card" onSubmit={submit} noValidate>
       {serverError && <p className="sales-error-summary" role="alert">{serverError}</p>}
       <div className="sales-form-grid">
-        <label className="sales-field">Vendor<select value={form.vendorId} onChange={(event) => updateVendor(event.target.value)} disabled={saving} aria-invalid={Boolean(errors.vendorId)}><option value="">Select a vendor</option>{vendors.map((vendor) => <option key={vendor.id} value={vendor.id}>{vendor.name}</option>)}</select>{errors.vendorId && <span className="sales-inline-error">{errors.vendorId}</span>}</label>
-        <label className="sales-field">Bill number<input value={form.billNumber} onChange={(event) => setForm({ ...form, billNumber: event.target.value })} disabled={saving} aria-invalid={Boolean(errors.billNumber)} />{errors.billNumber && <span className="sales-inline-error">{errors.billNumber}</span>}</label>
-        <label className="sales-field">Issue date<input type="date" value={form.issueDate} onChange={(event) => updateIssueDate(event.target.value)} disabled={saving} /></label>
-        <label className="sales-field">Due date<input type="date" value={form.dueDate} onChange={(event) => { setDueDateTouched(true); setForm({ ...form, dueDate: event.target.value }) }} disabled={saving} /></label>
-        <label className="sales-field sales-field--wide">Notes<textarea value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} disabled={saving} /></label>
+        <label className="sales-field">Vendor<select className="field" value={form.vendorId} onChange={(event) => updateVendor(event.target.value)} disabled={saving} aria-invalid={Boolean(errors.vendorId)}><option value="">Select a vendor</option>{vendors.map((vendor) => <option key={vendor.id} value={vendor.id}>{vendor.name}</option>)}</select>{errors.vendorId && <span className="sales-inline-error">{errors.vendorId}</span>}</label>
+        <label className="sales-field">Bill number<input className="field" value={form.billNumber} onChange={(event) => setForm({ ...form, billNumber: event.target.value })} disabled={saving} aria-invalid={Boolean(errors.billNumber)} />{errors.billNumber && <span className="sales-inline-error">{errors.billNumber}</span>}</label>
+        <label className="sales-field">Issue date<input className="field" type="date" value={form.issueDate} onChange={(event) => updateIssueDate(event.target.value)} disabled={saving} /></label>
+        <label className="sales-field">Due date<input className="field" type="date" value={form.dueDate} onChange={(event) => { setDueDateTouched(true); setForm({ ...form, dueDate: event.target.value }) }} disabled={saving} /></label>
+        <label className="sales-field sales-field--wide">Notes<textarea className="field" value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} disabled={saving} /></label>
       </div>
       <section className="invoice-form-section" aria-labelledby="bill-items-heading">
         <div className="sales-page__header"><h2 id="bill-items-heading">Items</h2><button className="sales-secondary-button" type="button" disabled={saving} onClick={() => setForm({ ...form, items: [...form.items, blankItem()] })}>Add line</button></div>
         <div className="sales-table-scroll"><table className="sales-table invoice-items-table"><thead><tr><th>Description</th><th>Expense or asset account</th><th className="sales-table__money">Amount</th><th><span className="visually-hidden">Remove</span></th></tr></thead><tbody>
-          {form.items.map((item, index) => <tr key={index}><td><input aria-label={`Item ${index + 1} description`} value={item.description} onChange={(event) => updateItem(index, 'description', event.target.value)} disabled={saving} />{errors[`item-${index}-description`] && <span className="sales-inline-error">{errors[`item-${index}-description`]}</span>}</td><td><select aria-label={`Item ${index + 1} account`} value={item.accountId} onChange={(event) => updateItem(index, 'accountId', event.target.value)} disabled={saving}><option value="">Choose account</option>{accounts.map((account) => <option key={account.id} value={account.id}>{account.code} — {account.name}</option>)}</select>{errors[`item-${index}-accountId`] && <span className="sales-inline-error">{errors[`item-${index}-accountId`]}</span>}</td><td><input aria-label={`Item ${index + 1} amount`} inputMode="decimal" value={item.amount} onChange={(event) => updateItem(index, 'amount', event.target.value)} disabled={saving} />{errors[`item-${index}-amount`] && <span className="sales-inline-error">{errors[`item-${index}-amount`]}</span>}</td><td><button className="invoice-line-remove" type="button" aria-label={`Remove item ${index + 1}`} disabled={saving || form.items.length === 1} onClick={() => setForm({ ...form, items: form.items.filter((_, itemIndex) => itemIndex !== index) })}>Remove</button></td></tr>)}
+          {form.items.map((item, index) => <tr key={index}><td><input className="field" aria-label={`Item ${index + 1} description`} value={item.description} onChange={(event) => updateItem(index, 'description', event.target.value)} disabled={saving} />{errors[`item-${index}-description`] && <span className="sales-inline-error">{errors[`item-${index}-description`]}</span>}</td><td><select className="field" aria-label={`Item ${index + 1} account`} value={item.accountId} onChange={(event) => updateItem(index, 'accountId', event.target.value)} disabled={saving}><option value="">Choose account</option>{accounts.map((account) => <option key={account.id} value={account.id}>{account.code} — {account.name}</option>)}</select>{errors[`item-${index}-accountId`] && <span className="sales-inline-error">{errors[`item-${index}-accountId`]}</span>}</td><td><input className="field" aria-label={`Item ${index + 1} amount`} inputMode="decimal" value={item.amount} onChange={(event) => updateItem(index, 'amount', event.target.value)} disabled={saving} />{errors[`item-${index}-amount`] && <span className="sales-inline-error">{errors[`item-${index}-amount`]}</span>}</td><td><button className="invoice-line-remove" type="button" aria-label={`Remove item ${index + 1}`} disabled={saving || form.items.length === 1} onClick={() => setForm({ ...form, items: form.items.filter((_, itemIndex) => itemIndex !== index) })}>Remove</button></td></tr>)}
         </tbody></table></div>
       </section>
       <section className="invoice-preview" aria-live="polite" aria-label="Bill total preview"><h2>Total preview</h2><p className="invoice-preview__note">Preview only. The server returns the official total after saving.</p><div className="invoice-preview__row invoice-preview__total"><span>Total</span><strong>{formatMoney(previewTotal(form.items))}</strong></div></section>

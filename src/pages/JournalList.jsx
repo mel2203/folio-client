@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { listJournalEntries } from '../api/journal.js'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
 import Pagination from '../components/Pagination.jsx'
+import PageHeader from '../components/PageHeader.jsx'
+import Panel from '../components/Panel.jsx'
 import StatusChip from '../components/StatusChip.jsx'
+import { Button } from '../components/ui/button.jsx'
 import { formatCalendarDate } from '../utils/calendar-date.js'
 import './Journal.css'
 
@@ -109,13 +114,14 @@ function JournalList() {
 
   return (
     <section className="journal-page">
-      <header className="journal-page__header">
-        <div>
-          <h1>Journal entries</h1>
-          <p>Review your company&apos;s posted journal entries.</p>
-        </div>
-        <Link className="journal-primary-link" to="/journal/new">New entry</Link>
-      </header>
+      <PageHeader
+        title="Journal entries"
+        sub="Review your company&apos;s posted journal entries."
+      >
+        <Button asChild>
+          <Link to="/journal/new">New entry</Link>
+        </Button>
+      </PageHeader>
 
       <form className="journal-filters" key={queryString} onSubmit={applyFilters}>
         <div className="journal-filter">
@@ -124,6 +130,7 @@ function JournalList() {
             id="journal-from"
             name="from"
             type="date"
+            className="field"
             defaultValue={from}
           />
         </div>
@@ -133,6 +140,7 @@ function JournalList() {
             id="journal-to"
             name="to"
             type="date"
+            className="field"
             defaultValue={to}
           />
         </div>
@@ -141,6 +149,7 @@ function JournalList() {
           <select
             id="journal-status"
             name="status"
+            className="field"
             defaultValue={status}
           >
             <option value="">All statuses</option>
@@ -148,13 +157,11 @@ function JournalList() {
             <option value="void">Void</option>
           </select>
         </div>
-        <button className="journal-secondary-button" type="submit">Apply filters</button>
+        <Button className="journal-secondary-button" variant="outline" type="submit">Apply filters</Button>
       </form>
 
       {isLoading && (
-        <p className="journal-state" role="status" aria-live="polite">
-          Loading journal entries...
-        </p>
+        <LoadingState label="Loading journal entries..." className="journal-state" />
       )}
 
       {!isLoading && error && (
@@ -164,8 +171,8 @@ function JournalList() {
       )}
 
       {!isLoading && !error && entries.length === 0 && (
-        <div className="journal-table-card">
-          <p className="journal-state">No journal entries found.</p>
+        <Panel className="journal-table-card journal-table-card--empty">
+          <EmptyState title="No journal entries found." className="journal-state journal-state--embedded" />
           {meta && (
             <Pagination
               page={meta.page}
@@ -174,55 +181,43 @@ function JournalList() {
               onPageChange={changePage}
             />
           )}
-        </div>
+          </Panel>
       )}
 
       {!isLoading && !error && entries.length > 0 && meta && (
-        <div className="journal-table-card">
-          <div className="journal-table-scroll">
-            <table className="journal-table">
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Memo</th>
-                  <th scope="col">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((entry) => (
-                  <tr
-                    key={entry.id}
-                    className="journal-table__clickable-row"
-                    role="link"
-                    tabIndex={0}
-                    aria-label={`Open journal entry${entry.memo ? `: ${entry.memo}` : ''}`}
-                    onClick={() => openEntry(entry.id)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        openEntry(entry.id)
-                      }
-                    }}
-                  >
-                    <td>
-                      <time dateTime={entry.entry_date}>{formatCalendarDate(entry.entry_date)}</time>
-                    </td>
-                    <td>{entry.memo || 'No memo'}</td>
-                    <td>
-                      <StatusChip tone={entry.status === 'posted' ? 'positive' : 'error'}>
-                        {entry.status}
-                      </StatusChip>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="journal-entry-list">
+          {entries.map((entry) => (
+            <Panel className="journal-entry-card" key={entry.id}>
+              <div
+                className="journal-entry"
+                role="link"
+                tabIndex={0}
+                aria-label={`Open journal entry${entry.memo ? `: ${entry.memo}` : ''}`}
+                onClick={() => openEntry(entry.id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    openEntry(entry.id)
+                  }
+                }}
+              >
+                <time className="journal-entry__date" dateTime={entry.entry_date}>
+                  {formatCalendarDate(entry.entry_date)}
+                </time>
+                <span className="journal-entry__memo">{entry.memo || 'No memo'}</span>
+                <StatusChip tone={entry.status === 'posted' ? 'positive' : 'error'}>
+                  {entry.status}
+                </StatusChip>
+              </div>
+            </Panel>
+          ))}
+          <div className="journal-table-card">
+            <Pagination
+              page={meta.page}
+              limit={meta.limit}
+              total={meta.total}
+              onPageChange={changePage}
+            />
           </div>
-          <Pagination
-            page={meta.page}
-            limit={meta.limit}
-            total={meta.total}
-            onPageChange={changePage}
-          />
         </div>
       )}
     </section>

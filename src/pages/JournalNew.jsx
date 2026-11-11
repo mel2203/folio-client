@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Plus, Trash2 } from 'lucide-react'
 import { getAccounts } from '../api/accounts.js'
 import { createJournalEntry } from '../api/journal.js'
 import StatusChip from '../components/StatusChip.jsx'
+import { Button } from '../components/ui/button.jsx'
+import LoadingState from '../components/LoadingState.jsx'
 import { formatMoney, parseAmountToCents, centsToAmount } from '../utils/money.js'
 import './Journal.css'
 import './JournalNew.css'
@@ -225,9 +228,7 @@ function JournalNew() {
 
   if (accountsLoading) {
     return (
-      <p className="journal-state" role="status" aria-live="polite">
-        Loading accounts...
-      </p>
+      <LoadingState label="Loading accounts..." className="journal-state" />
     )
   }
 
@@ -258,6 +259,7 @@ function JournalNew() {
               id="journal-entry-date"
               name="date"
               type="date"
+              className="field"
               value={date}
               onChange={(event) => {
                 setDate(event.target.value)
@@ -272,6 +274,7 @@ function JournalNew() {
               id="journal-entry-memo"
               name="memo"
               type="text"
+              className="field"
               maxLength={1000}
               value={memo}
               onChange={(event) => {
@@ -299,6 +302,7 @@ function JournalNew() {
                       <select
                         id={`${line.id}-account`}
                         name="accountId"
+                        className="field"
                         value={line.accountId}
                         onChange={(event) => updateLine(line.id, 'accountId', event.target.value)}
                       >
@@ -330,6 +334,7 @@ function JournalNew() {
                         id={`${line.id}-debit`}
                         name="debit"
                         type="text"
+                        className="field"
                         inputMode="decimal"
                         value={line.debit}
                         onChange={(event) => updateLine(line.id, 'debit', event.target.value)}
@@ -353,6 +358,7 @@ function JournalNew() {
                         id={`${line.id}-credit`}
                         name="credit"
                         type="text"
+                        className="field"
                         inputMode="decimal"
                         value={line.credit}
                         onChange={(event) => updateLine(line.id, 'credit', event.target.value)}
@@ -376,31 +382,39 @@ function JournalNew() {
                         id={`${line.id}-description`}
                         name="description"
                         type="text"
+                        className="field"
                         maxLength={500}
                         value={line.description}
                         onChange={(event) => updateLine(line.id, 'description', event.target.value)}
                       />
                     </div>
-                    <button
+                    <Button
                       className="journal-new__remove"
                       type="button"
+                      variant="outline"
                       disabled={lines.length <= 2}
                       onClick={() => removeLine(line.id)}
                       aria-label={`Remove line ${index + 1}`}
                     >
-                      Remove
-                    </button>
+                      <Trash2 aria-hidden="true" />
+                      <span>Remove</span>
+                    </Button>
                   </div>
                 </fieldset>
               )
             })}
           </div>
-          <button className="journal-secondary-button" type="button" onClick={addLine}>
+          <Button className="journal-secondary-button" type="button" variant="outline" onClick={addLine}>
+            <Plus aria-hidden="true" />
             Add line
-          </button>
+          </Button>
         </section>
 
-        <section className="journal-new__summary" aria-live="polite" aria-atomic="true">
+        <section
+          className={`journal-new__summary ${isBalanced ? 'journal-new__summary--balanced' : 'journal-new__summary--unbalanced'}`}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <h2>Entry totals</h2>
           <dl>
             <div>
@@ -438,13 +452,13 @@ function JournalNew() {
           </div>
         )}
 
-        <button
+        <Button
           className="journal-new__submit"
           type="submit"
           disabled={!canSubmit || isSubmitting}
         >
           {isSubmitting ? 'Saving entry...' : 'Save journal entry'}
-        </button>
+        </Button>
       </form>
     </section>
   )

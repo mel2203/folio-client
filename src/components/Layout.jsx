@@ -15,17 +15,12 @@ function Layout() {
 
   return (
     <div className="app-shell">
-      <Sidebar />
+      <Sidebar
+        companyName={company?.name}
+        userName={user?.fullName}
+        onLogout={handleLogout}
+      />
       <div className="app-shell__main">
-        <header className="topbar">
-          <p className="topbar__company">{company?.name ?? 'Folio'}</p>
-          <div className="topbar__account">
-            <span className="topbar__name">{user?.fullName ?? 'Account'}</span>
-            <button className="topbar__logout" type="button" onClick={handleLogout}>
-              Log out
-            </button>
-          </div>
-        </header>
         <main className="page-content">
           <ReportsPrintHeader />
           <Outlet />

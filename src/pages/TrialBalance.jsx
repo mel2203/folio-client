@@ -2,6 +2,10 @@ import ReportsNav from '../components/ReportsNav.jsx'
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { getTrialBalance } from '../api/reports.js'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
+import PageHeader from '../components/PageHeader.jsx'
+import Panel from '../components/Panel.jsx'
 import StatusChip from '../components/StatusChip.jsx'
 import { formatMoney, parseAmountToCents } from '../utils/money.js'
 import { getTodayCalendarDate } from '../utils/calendar-date.js'
@@ -67,28 +71,27 @@ function TrialBalance() {
 
   return (
     <section className="trial-balance-page">
-      <header className="trial-balance-page__header">
-        <div>
-          <h1>Trial Balance</h1>
-          <p>Review posted account balances as of the selected date.</p>
-        </div>
-        <div className="trial-balance-page__control">
+      <PageHeader
+        className="trial-balance-page__header reports-page__header"
+        title="Trial Balance"
+        sub="Review posted account balances as of the selected date."
+      >
+        <div className="trial-balance-page__control reports-date-control">
           <label htmlFor="trial-balance-as-of">As of</label>
           <input
             id="trial-balance-as-of"
             type="date"
+            className="field"
             value={asOf}
             onChange={changeAsOf}
             disabled={isLoading}
           />
         </div>
-      </header>
+      </PageHeader>
       <ReportsNav />
 
       {isLoading && (
-        <p className="trial-balance-state" role="status" aria-live="polite">
-          Loading trial balance...
-        </p>
+        <LoadingState label="Loading trial balance..." className="trial-balance-state" />
       )}
 
       {!isLoading && error && (
@@ -106,11 +109,11 @@ function TrialBalance() {
           </div>
 
           {report.accounts.length === 0 ? (
-            <p className="trial-balance-state">No posted entries up to this date.</p>
+            <EmptyState title="No posted entries up to this date." className="trial-balance-state" />
           ) : (
-            <div className="trial-balance-card">
+            <Panel className="trial-balance-card">
               <div className="trial-balance-table-scroll">
-                <table className="trial-balance-table">
+                <table className="trial-balance-table ledger-table">
                   <caption className="visually-hidden">Trial Balance account balances</caption>
                   <thead>
                     <tr>
@@ -123,23 +126,23 @@ function TrialBalance() {
                   <tbody>
                     {report.accounts.map((account) => (
                       <tr key={account.accountId}>
-                        <td>{account.code}</td>
+                        <td className="font-mono trial-balance-table__code">{account.code}</td>
                         <td>{account.name}</td>
-                        <td className="trial-balance-table__money">{formatReportAmount(account.debit)}</td>
-                        <td className="trial-balance-table__money">{formatReportAmount(account.credit)}</td>
+                        <td className="trial-balance-table__money num">{formatReportAmount(account.debit)}</td>
+                        <td className="trial-balance-table__money num">{formatReportAmount(account.credit)}</td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
                     <tr className="trial-balance-table__grand-total">
                       <th scope="row" colSpan="2">Totals</th>
-                      <td className="trial-balance-table__money">{formatReportAmount(report.totals.debit)}</td>
-                      <td className="trial-balance-table__money">{formatReportAmount(report.totals.credit)}</td>
+                      <td className="trial-balance-table__money num">{formatReportAmount(report.totals.debit)}</td>
+                      <td className="trial-balance-table__money num">{formatReportAmount(report.totals.credit)}</td>
                     </tr>
                   </tfoot>
                 </table>
               </div>
-            </div>
+              </Panel>
           )}
         </>
       )}

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import PageHeader from '../components/PageHeader.jsx'
+import LoadingState from '../components/LoadingState.jsx'
 import { getAccounts } from '../api/accounts.js'
 import { createInvoice, getInvoice, listCustomers, updateInvoice } from '../api/sales.js'
 import { addCalendarDays, getTodayCalendarDate } from '../utils/calendar-date.js'
@@ -162,34 +164,33 @@ function InvoiceForm() {
     }
   }
 
-  if (initializing) return <p className="sales-state" role="status">Loading invoice form...</p>
+  if (initializing) return <LoadingState label="Loading invoice form..." className="sales-state" />
   if (serverError && customers.length === 0 && accounts.length === 0) return <p className="sales-state sales-state--error" role="alert">Error: {serverError}</p>
 
   return (
     <section className="sales-form-page invoice-form-page">
-      <header className="sales-form-page__header">
-        <div><h1>{editing ? 'Edit draft invoice' : 'New invoice'}</h1><p>Invoice totals are calculated from the line items.</p></div>
+      <PageHeader title={editing ? 'Edit draft invoice' : 'New invoice'} sub="Invoice totals are calculated from the line items.">
         <Link className="sales-link" to="/invoices">Back to invoices</Link>
-      </header>
+      </PageHeader>
       <form className="invoice-form-card" onSubmit={submit} noValidate>
         {serverError && <p className="sales-error-summary" role="alert">{serverError}</p>}
         <div className="sales-form-grid">
           <label className="sales-field">Customer
-            <select value={form.customerId} onChange={(event) => updateCustomer(event.target.value)} disabled={saving} aria-invalid={Boolean(errors.customerId)}>
+            <select className="field" value={form.customerId} onChange={(event) => updateCustomer(event.target.value)} disabled={saving} aria-invalid={Boolean(errors.customerId)}>
               <option value="">Select a customer</option>
               {customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}
             </select>
             {errors.customerId && <span className="sales-inline-error">{errors.customerId}</span>}
           </label>
           <label className="sales-field">Issue date
-            <input type="date" value={form.issueDate} onChange={(event) => updateIssueDate(event.target.value)} disabled={saving} aria-invalid={Boolean(errors.issueDate)} />
+            <input className="field" type="date" value={form.issueDate} onChange={(event) => updateIssueDate(event.target.value)} disabled={saving} aria-invalid={Boolean(errors.issueDate)} />
             {errors.issueDate && <span className="sales-inline-error">{errors.issueDate}</span>}
           </label>
           <label className="sales-field">Due date
-            <input type="date" value={form.dueDate} onChange={(event) => { setDueDateTouched(true); setForm((current) => ({ ...current, dueDate: event.target.value })) }} disabled={saving} aria-invalid={Boolean(errors.dueDate)} />
+            <input className="field" type="date" value={form.dueDate} onChange={(event) => { setDueDateTouched(true); setForm((current) => ({ ...current, dueDate: event.target.value })) }} disabled={saving} aria-invalid={Boolean(errors.dueDate)} />
             {errors.dueDate && <span className="sales-inline-error">{errors.dueDate}</span>}
           </label>
-          <label className="sales-field sales-field--wide">Notes<textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} disabled={saving} /></label>
+          <label className="sales-field sales-field--wide">Notes<textarea className="field" value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} disabled={saving} /></label>
         </div>
 
         <section className="invoice-form-section" aria-labelledby="invoice-items-heading">
@@ -200,13 +201,13 @@ function InvoiceForm() {
               <tbody>
                 {form.items.map((item, index) => (
                   <tr key={index}>
-                    <td><input aria-label={`Item ${index + 1} description`} value={item.description} onChange={(event) => updateItem(index, 'description', event.target.value)} disabled={saving} />{errors[`item-${index}-description`] && <span className="sales-inline-error">{errors[`item-${index}-description`]}</span>}</td>
-                    <td><select aria-label={`Item ${index + 1} revenue account`} value={item.revenueAccountId} onChange={(event) => updateItem(index, 'revenueAccountId', event.target.value)} disabled={saving}><option value="">Choose account</option>{accounts.map((account) => <option key={account.id} value={account.id}>{account.code} — {account.name}</option>)}</select>{errors[`item-${index}-revenueAccountId`] && <span className="sales-inline-error">{errors[`item-${index}-revenueAccountId`]}</span>}</td>
-                    <td><input aria-label={`Item ${index + 1} quantity`} inputMode="decimal" value={item.quantity} onChange={(event) => updateItem(index, 'quantity', event.target.value)} disabled={saving} />{errors[`item-${index}-quantity`] && <span className="sales-inline-error">{errors[`item-${index}-quantity`]}</span>}</td>
-                    <td><input aria-label={`Item ${index + 1} unit price`} inputMode="decimal" value={item.unitPrice} onChange={(event) => updateItem(index, 'unitPrice', event.target.value)} disabled={saving} />{errors[`item-${index}-unitPrice`] && <span className="sales-inline-error">{errors[`item-${index}-unitPrice`]}</span>}</td>
-                    <td><input aria-label={`Item ${index + 1} tax rate`} inputMode="decimal" value={item.taxRate} onChange={(event) => updateItem(index, 'taxRate', event.target.value)} disabled={saving} />{errors[`item-${index}-taxRate`] && <span className="sales-inline-error">{errors[`item-${index}-taxRate`]}</span>}</td>
-                    <td className="sales-table__money">{preview?.lines[index] ? formatMoney(preview.lines[index].net) : '—'}</td>
-                    <td className="sales-table__money">{preview?.lines[index] ? formatMoney(preview.lines[index].tax) : '—'}</td>
+                    <td><input className="field" aria-label={`Item ${index + 1} description`} value={item.description} onChange={(event) => updateItem(index, 'description', event.target.value)} disabled={saving} />{errors[`item-${index}-description`] && <span className="sales-inline-error">{errors[`item-${index}-description`]}</span>}</td>
+                    <td><select className="field" aria-label={`Item ${index + 1} revenue account`} value={item.revenueAccountId} onChange={(event) => updateItem(index, 'revenueAccountId', event.target.value)} disabled={saving}><option value="">Choose account</option>{accounts.map((account) => <option key={account.id} value={account.id}>{account.code} — {account.name}</option>)}</select>{errors[`item-${index}-revenueAccountId`] && <span className="sales-inline-error">{errors[`item-${index}-revenueAccountId`]}</span>}</td>
+                    <td><input className="field" aria-label={`Item ${index + 1} quantity`} inputMode="decimal" value={item.quantity} onChange={(event) => updateItem(index, 'quantity', event.target.value)} disabled={saving} />{errors[`item-${index}-quantity`] && <span className="sales-inline-error">{errors[`item-${index}-quantity`]}</span>}</td>
+                    <td><input className="field" aria-label={`Item ${index + 1} unit price`} inputMode="decimal" value={item.unitPrice} onChange={(event) => updateItem(index, 'unitPrice', event.target.value)} disabled={saving} />{errors[`item-${index}-unitPrice`] && <span className="sales-inline-error">{errors[`item-${index}-unitPrice`]}</span>}</td>
+                    <td><input className="field" aria-label={`Item ${index + 1} tax rate`} inputMode="decimal" value={item.taxRate} onChange={(event) => updateItem(index, 'taxRate', event.target.value)} disabled={saving} />{errors[`item-${index}-taxRate`] && <span className="sales-inline-error">{errors[`item-${index}-taxRate`]}</span>}</td>
+                    <td className="sales-table__money num">{preview?.lines[index] ? formatMoney(preview.lines[index].net) : '—'}</td>
+                    <td className="sales-table__money num">{preview?.lines[index] ? formatMoney(preview.lines[index].tax) : '—'}</td>
                     <td><button className="invoice-line-remove" type="button" aria-label={`Remove item ${index + 1}`} disabled={saving || form.items.length === 1} onClick={() => setForm((current) => ({ ...current, items: current.items.filter((_, itemIndex) => itemIndex !== index) }))}>Remove</button></td>
                   </tr>
                 ))}

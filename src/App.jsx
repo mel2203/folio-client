@@ -3,6 +3,8 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import Layout from './components/Layout.jsx'
 import { ProtectedRoute, PublicOnlyRoute } from './components/ProtectedRoute.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+import { Toaster } from './components/ui/sonner.jsx'
+import LoadingState from './components/LoadingState.jsx'
 import Accounts from './pages/Accounts.jsx'
 import ArAging from './pages/ArAging.jsx'
 import BalanceSheet from './pages/BalanceSheet.jsx'
@@ -78,7 +80,7 @@ function App() {
               <Route
                 path="/dashboard"
                 element={(
-                  <Suspense fallback={<p className="auth-loading" role="status">Loading dashboard…</p>}>
+                  <Suspense fallback={<LoadingState label="Loading dashboard..." />}>
                     <Dashboard />
                   </Suspense>
                 )}
@@ -108,6 +110,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </ErrorBoundary>
+      <Toaster />
     </BrowserRouter>
   )
 }

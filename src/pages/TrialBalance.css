@@ -1,60 +1,54 @@
 .trial-balance-page__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-.trial-balance-page__header h1 {
-  margin: 0 0 8px;
-  font-size: 36px;
-}
-
-.trial-balance-page__header p {
-  color: var(--text-muted);
-}
-
-.trial-balance-page__control {
+.trial-balance-page__control,
+.reports-date-control {
   display: grid;
-  min-width: 190px;
-  gap: 8px;
+  min-width: 180px;
+  gap: 6px;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 500;
 }
 
-.trial-balance-page__control label {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.trial-balance-page__control input {
+.trial-balance-page__control .field,
+.reports-date-control .field {
   width: 100%;
-  min-height: 42px;
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 8px 10px;
-  background: var(--white);
-  color: var(--navy);
+}
+
+.reports-date-control label,
+.reports-date-control > span {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .trial-balance-page__status {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 14px;
+  margin: 0 0 12px;
 }
 
 .trial-balance-card,
 .trial-balance-state {
-  border-radius: 14px;
-  background: var(--white);
-  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+}
+
+.trial-balance-card {
+  padding: 8px;
 }
 
 .trial-balance-state {
-  padding: 24px;
+  padding: 20px;
 }
 
 .trial-balance-state--error {
-  border-left: 4px solid var(--coral);
+  border-left: 4px solid var(--destructive);
+  color: var(--foreground);
 }
 
 .trial-balance-table-scroll {
@@ -62,38 +56,39 @@
 }
 
 .trial-balance-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
+  min-width: 600px;
+}
+
+.trial-balance-table__code {
   text-align: left;
-}
-
-.trial-balance-table th,
-.trial-balance-table td {
-  border-bottom: 1px solid var(--rule);
-  padding: 14px 20px;
-}
-
-.trial-balance-table th {
-  color: var(--text-muted);
-  font-weight: 600;
 }
 
 .trial-balance-table__money {
   text-align: right;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
-.trial-balance-table__grand-total th,
-.trial-balance-table__grand-total td {
-  border-top: 3px double var(--navy);
-  border-bottom: 3px double var(--navy);
-  color: var(--navy);
-  font-weight: 700;
+.trial-balance-table tfoot th,
+.trial-balance-table tfoot td {
+  border-top: 1px solid var(--foreground);
+  border-bottom: 3px double var(--foreground);
+  color: var(--foreground);
+  font-weight: 600;
 }
 
-.visually-hidden {
+.trial-balance-page .status-chip--positive,
+.balance-sheet-page .status-chip--positive {
+  background: color-mix(in srgb, var(--success) 16%, var(--card));
+  color: var(--success-text);
+}
+
+.trial-balance-page .status-chip--error,
+.balance-sheet-page .status-chip--error {
+  border-color: var(--destructive);
+  background: color-mix(in srgb, var(--destructive) 12%, var(--card));
+  color: var(--destructive-text);
+}
+
+.trial-balance-page .visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -104,11 +99,8 @@
 }
 
 @media (max-width: 640px) {
-  .trial-balance-page__header {
-    flex-direction: column;
-  }
-
-  .trial-balance-page__control {
+  .trial-balance-page__control,
+  .reports-date-control {
     width: 100%;
   }
 }

@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
 import { createAccount, getAccounts, updateAccount } from '../api/accounts.js'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
+import PageHeader from '../components/PageHeader.jsx'
+import Panel from '../components/Panel.jsx'
+import { Button } from '../components/ui/button.jsx'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../components/ui/dialog.jsx'
 import './Accounts.css'
 
 const ACCOUNT_TYPES = [
@@ -178,20 +184,17 @@ function Accounts() {
 
   return (
     <section className="accounts-page">
-      <header className="accounts-page__header">
-        <div>
-          <h1>Chart of accounts</h1>
-          <p>Accounts available to your company.</p>
-        </div>
-        <button className="accounts-primary-button" type="button" onClick={openCreateForm}>
+      <PageHeader title="Chart of accounts" sub="Accounts available to your company.">
+        <Button type="button" onClick={openCreateForm}>
           Add account
-        </button>
-      </header>
+        </Button>
+      </PageHeader>
 
       <div className="accounts-toolbar">
         <label htmlFor="accounts-status-filter">Show</label>
         <select
           id="accounts-status-filter"
+          className="field"
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
           disabled={isLoading || isSaving}
@@ -203,9 +206,7 @@ function Accounts() {
       </div>
 
       {isLoading && (
-        <p className="accounts-state" role="status" aria-live="polite">
-          Loading accounts...
-        </p>
+        <LoadingState label="Loading accounts..." className="accounts-state" />
       )}
 
       {!isLoading && error && (
@@ -221,9 +222,10 @@ function Accounts() {
       )}
 
       {!isLoading && !error && visibleAccounts.length === 0 && (
-        <p className="accounts-state">
-          {accounts.length === 0 ? 'No accounts found.' : `No ${statusFilter} accounts found.`}
-        </p>
+        <EmptyState
+          title={accounts.length === 0 ? 'No accounts found.' : `No ${statusFilter} accounts found.`}
+          className="accounts-state"
+        />
       )}
 
       {!isLoading && !error && visibleAccounts.length > 0 && (
@@ -233,10 +235,9 @@ function Accounts() {
             if (groupedAccounts.length === 0) return null
 
             return (
-              <section className="accounts-group" key={value} aria-labelledby={`accounts-${value}`}>
-                <h2 id={`accounts-${value}`}>{label}</h2>
-                <div className="accounts-table-scroll">
-                  <table className="accounts-table">
+            <Panel className="accounts-group" key={value} title={label}>
+              <div className="accounts-table-scroll">
+                <table className="accounts-table ledger-table">
                     <thead>
                       <tr>
                         <th scope="col">Code</th>
@@ -254,7 +255,7 @@ function Accounts() {
                             className={account.isActive ? '' : 'accounts-table__row--inactive'}
                             key={account.id}
                           >
-                            <td>{account.code}</td>
+                            <td className="accounts-table__code">{account.code}</td>
                             <td>
                               <span>{account.name}</span>
                               {!account.isActive && (
@@ -264,28 +265,32 @@ function Accounts() {
                                 <span className="accounts-system-badge">System</span>
                               )}
                             </td>
-                            <td>{account.normalBalance}</td>
+                            <td className="text-muted-foreground">{account.normalBalance}</td>
                             <td>{parent ? `${parent.code} — ${parent.name}` : '—'}</td>
                             <td className="accounts-table__actions">
-                              <button
-                                type="button"
+                              <Button
                                 className="accounts-text-button"
+                                type="button"
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => openEditForm(account)}
                                 disabled={isSaving}
                                 aria-label={`Edit ${account.code} ${account.name}`}
                               >
                                 Edit
-                              </button>
+                              </Button>
                               {!account.systemRole && (
-                                <button
-                                  type="button"
+                                <Button
                                   className="accounts-text-button"
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
                                   onClick={() => toggleAccount(account)}
                                   disabled={isSaving}
                                   aria-label={`${account.isActive ? 'Deactivate' : 'Reactivate'} ${account.code} ${account.name}`}
                                 >
                                   {account.isActive ? 'Deactivate' : 'Reactivate'}
-                                </button>
+                                </Button>
                               )}
                             </td>
                           </tr>
@@ -294,22 +299,19 @@ function Accounts() {
                     </tbody>
                   </table>
                 </div>
-              </section>
+              </Panel>
             )
           })}
         </div>
       )}
 
-      {isFormOpen && (
-        <div className="accounts-dialog-backdrop">
-          <section
-            className="accounts-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="account-form-title"
-          >
+      <Dialog open={isFormOpen} onOpenChange={(open) => { if (!isSaving && !open) closeForm() }}>
+        <DialogContent className="accounts-dialog">
             <header className="accounts-dialog__header">
-              <h2 id="account-form-title">{editingAccount ? 'Edit account' : 'Add account'}</h2>
+              <div>
+                <DialogTitle>{editingAccount ? 'Edit account' : 'Add account'}</DialogTitle>
+                <DialogDescription>Enter the account details for your chart of accounts.</DialogDescription>
+              </div>
               <button type="button" className="accounts-text-button" onClick={closeForm} disabled={isSaving}>
                 Cancel
               </button>
@@ -335,6 +337,7 @@ function Accounts() {
                 <input
                   id="account-code"
                   name="code"
+                  className="field"
                   value={form.code}
                   onChange={(event) => updateField('code', event.target.value)}
                   disabled={isSaving}
@@ -349,6 +352,7 @@ function Accounts() {
                 <input
                   id="account-name"
                   name="name"
+                  className="field"
                   value={form.name}
                   onChange={(event) => updateField('name', event.target.value)}
                   disabled={isSaving}
@@ -364,6 +368,7 @@ function Accounts() {
                   <select
                     id="account-type"
                     name="type"
+                    className="field"
                     value={form.type}
                     onChange={(event) => {
                       updateField('type', event.target.value)
@@ -383,6 +388,7 @@ function Accounts() {
                 <select
                   id="account-parent"
                   name="parentId"
+                  className="field"
                   value={form.parentId}
                   onChange={(event) => updateField('parentId', event.target.value)}
                   disabled={isSaving}
@@ -410,9 +416,8 @@ function Accounts() {
                 </button>
               </footer>
             </form>
-          </section>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }

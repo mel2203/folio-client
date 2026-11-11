@@ -2,6 +2,10 @@ import ReportsNav from '../components/ReportsNav.jsx'
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { getBalanceSheet } from '../api/reports.js'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
+import PageHeader from '../components/PageHeader.jsx'
+import Panel from '../components/Panel.jsx'
 import StatusChip from '../components/StatusChip.jsx'
 import { getTodayCalendarDate } from '../utils/calendar-date.js'
 import { formatMoneyString } from '../utils/money.js'
@@ -9,13 +13,13 @@ import './BalanceSheet.css'
 
 function AccountTable({ accounts, label }) {
   return (
-    <table className="balance-sheet-table">
+    <table className="balance-sheet-table ledger-table">
       <caption className="visually-hidden">{label} accounts</caption>
       <tbody>
         {accounts.map((account) => (
           <tr key={account.accountId}>
             <td><span className="balance-sheet-table__code">{account.code}</span>{account.name}</td>
-            <td className="balance-sheet-table__money">{formatMoneyString(account.amount)}</td>
+            <td className="balance-sheet-table__money num">{formatMoneyString(account.amount)}</td>
           </tr>
         ))}
       </tbody>
@@ -77,26 +81,27 @@ function BalanceSheet() {
 
   return (
     <section className="balance-sheet-page">
-      <header className="balance-sheet-page__header">
-        <div>
-          <h1>Balance Sheet</h1>
-          <p>Assets, liabilities, and equity as of the selected date.</p>
-        </div>
-        <div className="balance-sheet-page__control">
+      <PageHeader
+        className="balance-sheet-page__header reports-page__header"
+        title="Balance Sheet"
+        sub="Assets, liabilities, and equity as of the selected date."
+      >
+        <div className="balance-sheet-page__control reports-date-control">
           <label htmlFor="balance-sheet-as-of">As of</label>
           <input
             id="balance-sheet-as-of"
             type="date"
+            className="field"
             value={asOf}
             onChange={changeAsOf}
             disabled={isLoading}
           />
         </div>
-      </header>
+      </PageHeader>
       <ReportsNav />
 
       {isLoading && (
-        <p className="balance-sheet-state" role="status" aria-live="polite">Loading balance sheet...</p>
+        <LoadingState label="Loading balance sheet..." className="balance-sheet-state" />
       )}
       {!isLoading && error && (
         <p className="balance-sheet-state balance-sheet-state--error" role="alert" aria-live="polite">
@@ -107,45 +112,56 @@ function BalanceSheet() {
         <>
           <div className="balance-sheet-page__status" aria-live="polite">
             {report.isBalanced
-              ? <StatusChip tone="positive">Assets = Liabilities + Equity</StatusChip>
-              : <StatusChip tone="error">Difference: {formatMoneyString(report.difference)}</StatusChip>}
+              ? (
+                <StatusChip tone="positive">
+                  <span aria-hidden="true">✓ </span>
+                  <span>Assets = Liabilities + Equity</span>
+                </StatusChip>
+              ) : (
+                <StatusChip tone="error">
+                  <span aria-hidden="true">× </span>
+                  <span>Difference: {formatMoneyString(report.difference)}</span>
+                </StatusChip>
+              )}
           </div>
           {hasNoAccounts ? (
-            <p className="balance-sheet-state">No posted entries up to this date.</p>
+            <EmptyState title="No posted entries up to this date." className="balance-sheet-state" />
           ) : (
-            <div className="balance-sheet-card">
-              <section className="balance-sheet-section" aria-labelledby="assets-heading">
+            <div className="balance-sheet-card balance-sheet-grid">
+              <Panel className="balance-sheet-section">
                 <h2 id="assets-heading">Assets</h2>
                 {report.assets.accounts.length > 0
                   ? <AccountTable accounts={report.assets.accounts} label="Assets" />
-                  : <p className="balance-sheet-section__empty">No asset balances.</p>}
-                <p className="balance-sheet-section__total"><span>Total assets</span><strong>{formatMoneyString(report.assets.total)}</strong></p>
-              </section>
+                  : <EmptyState title="No asset balances." className="folio-empty-state--inline balance-sheet-section__empty" />}
+                <p className="balance-sheet-section__total"><span>Total assets</span><strong className="num">{formatMoneyString(report.assets.total)}</strong></p>
+              </Panel>
 
-              <section className="balance-sheet-section" aria-labelledby="liabilities-heading">
-                <h2 id="liabilities-heading">Liabilities</h2>
-                {report.liabilities.accounts.length > 0
-                  ? <AccountTable accounts={report.liabilities.accounts} label="Liabilities" />
-                  : <p className="balance-sheet-section__empty">No liability balances.</p>}
-                <p className="balance-sheet-section__total"><span>Total liabilities</span><strong>{formatMoneyString(report.liabilities.total)}</strong></p>
-              </section>
+              <Panel className="balance-sheet-section balance-sheet-section--liabilities-equity">
+                <section className="balance-sheet-subsection" aria-labelledby="liabilities-heading">
+                  <h2 id="liabilities-heading">Liabilities</h2>
+                  {report.liabilities.accounts.length > 0
+                    ? <AccountTable accounts={report.liabilities.accounts} label="Liabilities" />
+                    : <EmptyState title="No liability balances." className="folio-empty-state--inline balance-sheet-section__empty" />}
+                  <p className="balance-sheet-section__total"><span>Total liabilities</span><strong className="num">{formatMoneyString(report.liabilities.total)}</strong></p>
+                </section>
 
-              <section className="balance-sheet-section" aria-labelledby="equity-heading">
-                <h2 id="equity-heading">Equity</h2>
-                {report.equity.accounts.length > 0
-                  ? <AccountTable accounts={report.equity.accounts} label="Equity" />
-                  : <p className="balance-sheet-section__empty">No equity account balances.</p>}
-                <p className="balance-sheet-section__current-earnings">
-                  <span>Current earnings</span><strong>{formatMoneyString(report.equity.currentEarnings)}</strong>
-                </p>
-                <p className="balance-sheet-section__total"><span>Total equity</span><strong>{formatMoneyString(report.equity.total)}</strong></p>
-              </section>
+                <section className="balance-sheet-subsection" aria-labelledby="equity-heading">
+                  <h2 id="equity-heading">Equity</h2>
+                  {report.equity.accounts.length > 0
+                    ? <AccountTable accounts={report.equity.accounts} label="Equity" />
+                    : <EmptyState title="No equity account balances." className="folio-empty-state--inline balance-sheet-section__empty" />}
+                  <p className="balance-sheet-section__current-earnings">
+                    <span>Current earnings</span><strong className="num">{formatMoneyString(report.equity.currentEarnings)}</strong>
+                  </p>
+                  <p className="balance-sheet-section__total"><span>Total equity</span><strong className="num">{formatMoneyString(report.equity.total)}</strong></p>
+                </section>
+              </Panel>
 
               <div className="balance-sheet-grand-total">
                 <span>Total assets</span>
-                <strong>{formatMoneyString(report.assets.total)}</strong>
+                <strong className="num">{formatMoneyString(report.assets.total)}</strong>
                 <span>Total liabilities and equity</span>
-                <strong>{formatMoneyString(report.totalLiabilitiesAndEquity)}</strong>
+                <strong className="num">{formatMoneyString(report.totalLiabilitiesAndEquity)}</strong>
               </div>
             </div>
           )}

@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ReportsNav from '../components/ReportsNav.jsx'
+import PageHeader from '../components/PageHeader.jsx'
+import Panel from '../components/Panel.jsx'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
 import StatusChip from '../components/StatusChip.jsx'
 import { formatCalendarDate, getTodayCalendarDate } from '../utils/calendar-date.js'
 import { formatMoneyString } from '../utils/money.js'
@@ -49,24 +53,30 @@ function AgingReportPage({ direction, getReport }) {
   const relation = receivable ? 'A/R' : 'A/P'
   return (
     <section className={`sales-page ${receivable ? 'ar-aging-page' : 'ap-aging-page'}`}>
-      <header className="sales-page__header ar-aging-page__header">
-        <div><h1>{title}</h1><p>Review outstanding {receivable ? 'customer' : 'vendor'} balances and reconcile them to the {relation} ledger.</p></div>
-        <label className="sales-field">As of<input type="date" value={asOf} onChange={changeAsOf} disabled={loading} /></label>
-      </header>
+      <PageHeader
+        className="sales-page__header ar-aging-page__header reports-page__header"
+        title={title}
+        sub={`Review outstanding ${receivable ? 'customer' : 'vendor'} balances and reconcile them to the ${relation} ledger.`}
+      >
+        <label className="reports-date-control">
+          <span>As of</span>
+          <input type="date" className="field" value={asOf} onChange={changeAsOf} disabled={loading} />
+        </label>
+      </PageHeader>
       <ReportsNav />
-      {loading && <p className="sales-state" role="status" aria-live="polite">Loading {noun} aging...</p>}
+      {loading && <LoadingState label={`Loading ${noun} aging...`} className="sales-state" />}
       {!loading && current.error && <p className="sales-state sales-state--error" role="alert">Error: {current.error}</p>}
       {!loading && !current.error && report && <>
         <div className="aging-status" aria-live="polite">
           {report.reconciles ? <StatusChip tone="positive">Aging reconciles to {relation} ledger</StatusChip> : <StatusChip tone="error">Difference: {formatMoneyString(report.difference)}</StatusChip>}
           <span className="sales-muted">As of {formatCalendarDate(report.asOf)} · Ledger balance {formatMoneyString(report.ledgerBalance)}</span>
         </div>
-        {rows.length === 0 ? <p className="sales-state">No outstanding {receivable ? 'invoices' : 'bills'} as of this date.</p> : (
-          <div className="aging-card"><div className="sales-table-scroll"><table className="sales-table">
+        {rows.length === 0 ? <EmptyState title={`No outstanding ${receivable ? 'invoices' : 'bills'} as of this date.`} className="sales-state reports-state" /> : (
+          <Panel className="aging-card reports-aging-card"><div className="sales-table-scroll"><table className="sales-table ledger-table">
             <thead><tr><th>{receivable ? 'Customer' : 'Vendor'}</th><th className="sales-table__money">Current</th><th className="sales-table__money">1–30 days</th><th className="sales-table__money">31–60 days</th><th className="sales-table__money">61–90 days</th><th className="sales-table__money">90+ days</th><th className="sales-table__money">Total</th></tr></thead>
             <tbody>{rows.map((row) => <tr key={row[rowId]}><td>{row.name}</td><td className="sales-table__money">{formatMoneyString(row.current)}</td><td className="sales-table__money">{formatMoneyString(row.days1To30)}</td><td className="sales-table__money">{formatMoneyString(row.days31To60)}</td><td className="sales-table__money">{formatMoneyString(row.days61To90)}</td><td className="sales-table__money">{formatMoneyString(row.days90Plus)}</td><td className="sales-table__money">{formatMoneyString(row.total)}</td></tr>)}</tbody>
             <tfoot><tr className="invoice-preview__total"><th scope="row">Total outstanding</th><td className="sales-table__money">{formatMoneyString(report.totals.current)}</td><td className="sales-table__money">{formatMoneyString(report.totals.days1To30)}</td><td className="sales-table__money">{formatMoneyString(report.totals.days31To60)}</td><td className="sales-table__money">{formatMoneyString(report.totals.days61To90)}</td><td className="sales-table__money">{formatMoneyString(report.totals.days90Plus)}</td><td className="sales-table__money">{formatMoneyString(report.totals.total)}</td></tr></tfoot>
-          </table></div></div>
+          </table></div></Panel>
         )}
       </>}
     </section>

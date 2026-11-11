@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 import {
   Bar,
   BarChart,
@@ -12,7 +13,13 @@ import {
 } from 'recharts'
 import { getDashboardSummary } from '../api/dashboard.js'
 import { listInvoices } from '../api/sales.js'
-import Toast from '../components/Toast.jsx'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
+import { Button } from '../components/ui/button.jsx'
+import PageHeader from '../components/PageHeader.jsx'
+import Panel from '../components/Panel.jsx'
+import Stat from '../components/Stat.jsx'
+import { useAuth } from '../context/useAuth.js'
 import { formatCalendarDate } from '../utils/calendar-date.js'
 import { formatMoney, formatMoneyString, parseAmountToCents } from '../utils/money.js'
 import './Dashboard.css'
@@ -40,6 +47,13 @@ function preparePerformance(months) {
     revenue: month.revenue,
     expenses: month.expenses,
   }))
+}
+
+function getGreeting(date = new Date()) {
+  const hour = date.getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 18) return 'Good afternoon'
+  return 'Good evening'
 }
 
 function isDashboardSummary(value) {
@@ -140,13 +154,12 @@ async function loadOverdueInvoices(asOf, overdueCount) {
 }
 
 function Dashboard() {
+  const { user, company } = useAuth()
   const [refreshVersion, setRefreshVersion] = useState(0)
   const [summaryState, setSummaryState] = useState(null)
   const [invoiceState, setInvoiceState] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
   const notifyOnRefresh = useRef(false)
-  const [toastMessage, setToastMessage] = useState('')
-  const [toastTone, setToastTone] = useState('positive')
   const summary = summaryState?.data ?? null
   const summaryError = summaryState?.error ?? ''
   const overdueInvoices = invoiceState?.data ?? null
@@ -158,6 +171,7 @@ function Dashboard() {
   const hasPerformance = performance.some((month) => (
     month.revenueCents !== 0 || month.expensesCents !== 0
   ))
+  const incomeIsNegative = summary?.netIncomeThisMonth.startsWith('-')
 
   useEffect(() => {
     let active = true
@@ -199,15 +213,13 @@ function Dashboard() {
       setRefreshing(false)
       if (notifyOnRefresh.current) {
         const hadError = !validSummary || !validInvoices
-        setToastTone(hadError ? 'error' : 'positive')
-        setToastMessage(hadError ? 'Some dashboard information could not be refreshed.' : 'Dashboard updated.')
+        if (hadError) toast.error('Some dashboard information could not be refreshed.')
+        else toast.success('Dashboard updated.')
         notifyOnRefresh.current = false
       }
     })
     return () => { active = false }
   }, [refreshVersion])
-
-  const dismissToast = useCallback(() => setToastMessage(''), [])
 
   function refreshDashboard() {
     setRefreshing(true)
@@ -219,28 +231,25 @@ function Dashboard() {
 
   return (
     <section className="dashboard-page">
-      <header className="dashboard-header">
-        <div>
-          <h1>Dashboard</h1>
-          <p>Your business at a glance.</p>
-        </div>
-        <div className="dashboard-header__actions">
-          <button className="dashboard-refresh" type="button" onClick={refreshDashboard} disabled={refreshing || loading}>
-            {refreshing ? 'Refreshing…' : 'Refresh'}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Dashboard"
+        sub={`${getGreeting()}${user?.fullName ? `, ${user.fullName.split(' ')[0]}` : ''} · ${company?.name || 'Your business'}${summary ? ` · As of ${formatCalendarDate(summary.asOf)}` : ''}`}
+      >
+        <Button type="button" onClick={refreshDashboard} disabled={refreshing || loading}>
+          {refreshing ? 'Refreshing…' : 'Refresh'}
+        </Button>
+      </PageHeader>
 
       {loading && (
         <div className="dashboard-skeleton" role="status" aria-live="polite">
           <span className="dashboard-sr-only">Loading dashboard…</span>
           <div className="dashboard-kpis" aria-hidden="true">
-            {Array.from({ length: 4 }, (_, index) => <div className="dashboard-skeleton__kpi" key={index} />)}
+            {Array.from({ length: 4 }, (_, index) => <div className="dashboard-skeleton__kpi rounded-2xl border border-border bg-card shadow-soft" key={index} />)}
           </div>
-          <div className="dashboard-skeleton__panel" aria-hidden="true" />
+          <div className="dashboard-skeleton__panel rounded-2xl border border-border bg-card shadow-soft" aria-hidden="true" />
           <div className="dashboard-skeleton__row" aria-hidden="true">
-            <div className="dashboard-skeleton__panel" />
-            <div className="dashboard-skeleton__panel" />
+            <div className="dashboard-skeleton__panel rounded-2xl border border-border bg-card shadow-soft" />
+            <div className="dashboard-skeleton__panel rounded-2xl border border-border bg-card shadow-soft" />
           </div>
         </div>
       )}
@@ -248,36 +257,40 @@ function Dashboard() {
       {!loading && summaryError && (
         <div className="dashboard-state dashboard-state--error" role="alert" aria-live="polite">
           <strong>Dashboard unavailable.</strong> {summaryError}
-          <button type="button" onClick={refreshDashboard} disabled={refreshing}>Try again</button>
+          <Button type="button" onClick={refreshDashboard} disabled={refreshing}>Try again</Button>
         </div>
       )}
 
       {!loading && summary && (
         <>
           <section className="dashboard-kpis" aria-label="Key balances and performance">
-            <article className="dashboard-card dashboard-kpi">
-              <h2>Cash balance</h2>
-              <p>{formatMoneyString(summary.balances.cash)}</p>
-              <span>As of {formatCalendarDate(summary.asOf)}</span>
-            </article>
-            <article className="dashboard-card dashboard-kpi">
-              <h2>Accounts receivable</h2>
-              <p>{formatMoneyString(summary.balances.accountsReceivable)}</p>
-              <span>Outstanding from customers</span>
-            </article>
-            <article className="dashboard-card dashboard-kpi">
-              <h2>Accounts payable</h2>
-              <p>{formatMoneyString(summary.balances.accountsPayable)}</p>
-              <span>Outstanding to vendors</span>
-            </article>
-            <article className="dashboard-card dashboard-kpi">
-              <h2>Net income this month</h2>
-              <p>{formatMoneyString(summary.netIncomeThisMonth)}</p>
-              <span>Revenue less expenses</span>
-            </article>
+            <Stat
+              label="Cash balance"
+              value={formatMoneyString(summary.balances.cash)}
+              tone={summary.balances.cash.startsWith('-') ? 'bad' : 'good'}
+              className="dashboard-kpi"
+            />
+            <Stat
+              label="Accounts receivable"
+              value={formatMoneyString(summary.balances.accountsReceivable)}
+              tone={summary.balances.accountsReceivable.startsWith('-') ? 'bad' : 'good'}
+              className="dashboard-kpi"
+            />
+            <Stat
+              label="Accounts payable"
+              value={formatMoneyString(summary.balances.accountsPayable)}
+              tone="bad"
+              className="dashboard-kpi"
+            />
+            <Stat
+              label="Net income this month"
+              value={formatMoneyString(summary.netIncomeThisMonth)}
+              tone={incomeIsNegative ? 'bad' : 'good'}
+              className="dashboard-kpi"
+            />
           </section>
 
-          <section className="dashboard-card dashboard-panel" aria-labelledby="dashboard-performance-title">
+          <Panel className="dashboard-panel" aria-labelledby="dashboard-performance-title">
             <div className="dashboard-panel__heading">
               <div>
                 <h2 id="dashboard-performance-title">Revenue vs expenses</h2>
@@ -286,7 +299,7 @@ function Dashboard() {
               <Link to="/reports/income-statement">View Profit and Loss</Link>
             </div>
             {!hasPerformance ? (
-              <p className="dashboard-empty">No posted revenue or expenses for this period.</p>
+              <EmptyState title="No posted revenue or expenses for this period." className="folio-empty-state--inline" />
             ) : (
               <>
                 <div className="dashboard-chart" role="img" aria-label="Bar chart comparing revenue and expenses for the last six months.">
@@ -326,10 +339,10 @@ function Dashboard() {
                 </table>
               </>
             )}
-          </section>
+          </Panel>
 
           <div className="dashboard-panels">
-            <section className="dashboard-card dashboard-panel" aria-labelledby="dashboard-overdue-title">
+            <Panel className="dashboard-panel" aria-labelledby="dashboard-overdue-title">
               <div className="dashboard-panel__heading">
                 <div>
                   <h2 id="dashboard-overdue-title">Overdue invoices</h2>
@@ -340,9 +353,9 @@ function Dashboard() {
               {overdueError ? (
                 <p className="dashboard-state dashboard-state--error" role="alert">Error: {overdueError}</p>
               ) : overdueInvoices === null ? (
-                <p className="dashboard-empty" role="status" aria-live="polite">Loading overdue invoices…</p>
+                <LoadingState label="Loading overdue invoices..." className="folio-loading-state--inline" />
               ) : overdueInvoices.length === 0 ? (
-                <p className="dashboard-empty">No overdue invoices.</p>
+                <EmptyState title="No overdue invoices." className="folio-empty-state--inline" />
               ) : (
                 <div className="dashboard-list">
                   {overdueInvoices.map((invoice) => (
@@ -351,14 +364,14 @@ function Dashboard() {
                         <strong>{invoice.invoiceNumber || 'Invoice'}</strong>
                         <small>{invoice.customerName} · Due {formatCalendarDate(invoice.dueDate)}</small>
                       </span>
-                      <strong>{formatMoney(invoice.outstandingCents)}</strong>
+                      <strong className="num text-destructive-text">{formatMoney(invoice.outstandingCents)}</strong>
                     </Link>
                   ))}
                 </div>
               )}
-            </section>
+            </Panel>
 
-            <section className="dashboard-card dashboard-panel" aria-labelledby="dashboard-expenses-title">
+            <Panel className="dashboard-panel" aria-labelledby="dashboard-expenses-title">
               <div className="dashboard-panel__heading">
                 <div>
                   <h2 id="dashboard-expenses-title">Top expenses this month</h2>
@@ -367,21 +380,21 @@ function Dashboard() {
                 <Link to="/reports/income-statement">See report</Link>
               </div>
               {summary.topExpenseAccounts.length === 0 ? (
-                <p className="dashboard-empty">No posted expenses this month.</p>
+                <EmptyState title="No posted expenses this month." className="folio-empty-state--inline" />
               ) : (
                 <div className="dashboard-list">
                   {summary.topExpenseAccounts.map((account) => (
                     <div className="dashboard-list__row dashboard-list__row--static" key={account.accountId}>
                       <span><strong>{account.name}</strong><small>{account.code}</small></span>
-                      <strong>{formatMoneyString(account.amount)}</strong>
+                      <strong className="num">{formatMoneyString(account.amount)}</strong>
                     </div>
                   ))}
                 </div>
               )}
-            </section>
+            </Panel>
           </div>
 
-          <section className="dashboard-card dashboard-panel" aria-labelledby="dashboard-customers-title">
+          <Panel className="dashboard-panel" aria-labelledby="dashboard-customers-title">
             <div className="dashboard-panel__heading">
               <div>
                 <h2 id="dashboard-customers-title">Top customers this year</h2>
@@ -390,21 +403,20 @@ function Dashboard() {
               <Link to="/customers">View customers</Link>
             </div>
             {summary.topCustomers.length === 0 ? (
-              <p className="dashboard-empty">No posted invoices for this year yet.</p>
+              <EmptyState title="No posted invoices for this year yet." className="folio-empty-state--inline" />
             ) : (
               <div className="dashboard-list">
                 {summary.topCustomers.map((customer, index) => (
                   <div className="dashboard-list__row dashboard-list__row--static" key={customer.customerId}>
                     <span><strong>{index + 1}. {customer.name}</strong><small>Invoiced this year</small></span>
-                    <strong>{formatMoneyString(customer.invoicedAmount)}</strong>
+                    <strong className="num">{formatMoneyString(customer.invoicedAmount)}</strong>
                   </div>
                 ))}
               </div>
             )}
-          </section>
+          </Panel>
         </>
       )}
-      <Toast message={toastMessage} tone={toastTone} onDismiss={dismissToast} />
     </section>
   )
 }
