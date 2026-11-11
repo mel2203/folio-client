@@ -14,6 +14,8 @@ function InvoiceDetail() {
   const { company } = useAuth()
   const [invoice, setInvoice] = useState(null)
   const [accounts, setAccounts] = useState([])
+  const [accountsLoading, setAccountsLoading] = useState(true)
+  const [accountsError, setAccountsError] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [actionError, setActionError] = useState('')
@@ -33,8 +35,17 @@ function InvoiceDetail() {
   useEffect(() => {
     let alive = true
     getAccounts({ active: true })
-      .then((result) => { if (alive && Array.isArray(result)) setAccounts(result.filter((account) => account.type === 'asset' && account.isActive)) })
-      .catch(() => {})
+      .then((result) => {
+        if (!Array.isArray(result)) throw new Error('The server returned an invalid accounts response.')
+        if (alive) setAccounts(result.filter((account) => account.type === 'asset' && account.isActive))
+      })
+      .catch((requestError) => {
+        if (alive) {
+          setAccounts([])
+          setAccountsError(requestError.message || 'Unable to load deposit accounts.')
+        }
+      })
+      .finally(() => { if (alive) setAccountsLoading(false) })
     return () => { alive = false }
   }, [])
 
@@ -124,6 +135,8 @@ function InvoiceDetail() {
       </div>
       <div className="invoice-detail-card">
         {actionError && <p className="sales-error-summary" role="alert">{actionError}</p>}
+        {accountsLoading && <p className="sales-muted" role="status" aria-live="polite">Loading deposit accounts...</p>}
+        {accountsError && <p className="sales-error-summary" role="alert">Unable to load deposit accounts: {accountsError} Reload the page to try again.</p>}
         <div className="invoice-detail__actions">
           <SalesStatus status={invoice.status} />
           {isOverdue && <span className="sales-overdue">Overdue</span>}
@@ -132,7 +145,7 @@ function InvoiceDetail() {
             <button className="sales-secondary-button" type="button" disabled={busy} onClick={handleDelete}>Delete draft</button>
             <button className="sales-primary-button" type="button" disabled={busy} onClick={() => runAction(() => sendInvoice(id))}>{busy ? 'Sending...' : 'Send invoice'}</button>
           </>}
-          {['sent', 'partial'].includes(invoice.status) && <button className="sales-primary-button" type="button" disabled={busy} onClick={openPayment}>Record payment</button>}
+          {['sent', 'partial'].includes(invoice.status) && <button className="sales-primary-button" type="button" disabled={busy || accountsLoading || Boolean(accountsError)} onClick={openPayment}>Record payment</button>}
           {invoice.status === 'sent' && invoice.amountPaid === '0.00' && (
             <button className="sales-danger-button" type="button" disabled={busy} onClick={() => {
               if (window.confirm('Void this unpaid invoice? A reversing journal entry will be posted.')) runAction(() => voidInvoice(id))

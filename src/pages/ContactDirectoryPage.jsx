@@ -30,6 +30,7 @@ function ContactDirectoryPage({ kind = 'customer' }) {
   const [fieldError, setFieldError] = useState('')
   const [actionError, setActionError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [pendingContactIds, setPendingContactIds] = useState(() => new Set())
 
   useEffect(() => {
     let alive = true
@@ -116,14 +117,22 @@ function ContactDirectoryPage({ kind = 'customer' }) {
   }
 
   async function toggleActive(customer) {
+    if (pendingContactIds.has(customer.id)) return
     const action = customer.isActive ? 'deactivate' : 'reactivate'
     if (!window.confirm(`${action === 'deactivate' ? 'Deactivate' : 'Reactivate'} ${customer.name}?`)) return
     setActionError('')
+    setPendingContactIds((currentIds) => new Set(currentIds).add(customer.id))
     try {
       await updateContact(customer.id, { isActive: !customer.isActive })
       setRefreshKey((value) => value + 1)
     } catch (error) {
       setActionError(error.message || `Unable to ${action} this ${entity}.`)
+    } finally {
+      setPendingContactIds((currentIds) => {
+        const nextIds = new Set(currentIds)
+        nextIds.delete(customer.id)
+        return nextIds
+      })
     }
   }
 
@@ -162,8 +171,10 @@ function ContactDirectoryPage({ kind = 'customer' }) {
                     <td>{customer.paymentTermsDays} days</td><td>{customer.isActive ? 'Active' : 'Inactive'}</td>
                     <td><div className="sales-actions">
                       <button className="sales-secondary-button" type="button" onClick={() => openEdit(customer)}>Edit</button>
-                      <button className="sales-secondary-button" type="button" onClick={() => toggleActive(customer)}>
-                        {customer.isActive ? 'Deactivate' : 'Reactivate'}
+                      <button className="sales-secondary-button" type="button" disabled={pendingContactIds.has(customer.id)} onClick={() => toggleActive(customer)}>
+                        {pendingContactIds.has(customer.id)
+                          ? customer.isActive ? 'Deactivating...' : 'Reactivating...'
+                          : customer.isActive ? 'Deactivate' : 'Reactivate'}
                       </button>
                     </div></td>
                   </tr>

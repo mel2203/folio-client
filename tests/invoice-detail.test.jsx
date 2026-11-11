@@ -24,9 +24,11 @@ const BASE_INVOICE = {
   payments: [],
 }
 
-function renderDetail(status, amountPaid = '0.00') {
+function renderDetail(status, amountPaid = '0.00', loadAccounts = () => Promise.resolve([
+  { id: 'cash-1', code: '1000', name: 'Cash', type: 'asset', isActive: true },
+])) {
   getInvoice.mockResolvedValue({ ...BASE_INVOICE, status, amountPaid })
-  getAccounts.mockResolvedValue([{ id: 'cash-1', code: '1000', name: 'Cash', type: 'asset', isActive: true }])
+  getAccounts.mockImplementation(loadAccounts)
   return render(
     <AuthContext.Provider value={{ company: { name: 'Example Company' } }}>
       <MemoryRouter initialEntries={['/invoices/invoice-1']}>
@@ -59,6 +61,15 @@ describe('invoice detail actions', () => {
       const query = label === 'Edit draft' ? screen.queryByRole('link', { name: label }) : screen.queryByRole('button', { name: label })
       expect(query).not.toBeInTheDocument()
     })
+  })
+
+  it('surfaces deposit account loading errors and disables payment', async () => {
+    renderDetail('sent', '0.00', () => Promise.reject(new Error('Cannot reach the server')))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Unable to load deposit accounts: Cannot reach the server',
+    )
+    expect(screen.getByRole('button', { name: 'Record payment' })).toBeDisabled()
   })
 
   it('calls the browser print dialog from the invoice print button', async () => {
