@@ -3,6 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getAccounts } from '../api/accounts.js'
 import { deleteInvoice, getInvoice, recordInvoicePayment, sendInvoice, voidInvoice } from '../api/sales.js'
 import SalesStatus from '../components/SalesStatus.jsx'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog.jsx'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
 import { useAuth } from '../context/useAuth.js'
 import { formatCalendarDate, getTodayCalendarDate } from '../utils/calendar-date.js'
 import { centsToAmount, formatMoney, formatMoneyString, parseAmountToCents } from '../utils/money.js'
@@ -21,6 +24,7 @@ function InvoiceDetail() {
   const [actionError, setActionError] = useState('')
   const [busy, setBusy] = useState(false)
   const [paymentOpen, setPaymentOpen] = useState(false)
+  const [voidOpen, setVoidOpen] = useState(false)
   const [paymentForm, setPaymentForm] = useState({ paymentDate: getTodayCalendarDate(), amount: '', method: 'bank_transfer', reference: '', depositAccountId: '' })
 
   useEffect(() => {
@@ -114,7 +118,7 @@ function InvoiceDetail() {
     } finally { setBusy(false) }
   }
 
-  if (loading) return <p className="sales-state" role="status">Loading invoice...</p>
+  if (loading) return <LoadingState label="Loading invoice..." className="sales-state" />
   if (error || !invoice) return <p className="sales-state sales-state--error" role="alert">Error: {error || 'Invoice not found.'}</p>
 
   const isOverdue = ['sent', 'partial'].includes(invoice.status) && invoice.dueDate < getTodayCalendarDate()
@@ -128,14 +132,20 @@ function InvoiceDetail() {
         </div>
         <Link className="sales-link" to="/invoices">Back to invoices</Link>
       </header>
-      <div className="invoice-detail__print-header">
-        <p>{company?.name || 'Folio'}</p>
-        <h1>{invoice.invoiceNumber || 'Draft invoice'}</h1>
-        <p>Issue date: {formatCalendarDate(invoice.issueDate)} · Due date: {formatCalendarDate(invoice.dueDate)}</p>
-      </div>
       <div className="invoice-detail-card">
+        <div className="invoice-detail__print-header">
+          <div>
+            <p className="invoice-detail__company">{company?.name || 'Folio'}</p>
+            <p>Issue date: {formatCalendarDate(invoice.issueDate)} · Due date: {formatCalendarDate(invoice.dueDate)}</p>
+          </div>
+          <div className="invoice-detail__document-title">
+            <h1>Invoice</h1>
+            <p>{invoice.invoiceNumber || 'Draft invoice'}</p>
+            <SalesStatus status={invoice.status} />
+          </div>
+        </div>
         {actionError && <p className="sales-error-summary" role="alert">{actionError}</p>}
-        {accountsLoading && <p className="sales-muted" role="status" aria-live="polite">Loading deposit accounts...</p>}
+        {accountsLoading && <LoadingState label="Loading deposit accounts..." className="folio-loading-state--inline" />}
         {accountsError && <p className="sales-error-summary" role="alert">Unable to load deposit accounts: {accountsError} Reload the page to try again.</p>}
         <div className="invoice-detail__actions">
           <SalesStatus status={invoice.status} />
@@ -147,17 +157,15 @@ function InvoiceDetail() {
           </>}
           {['sent', 'partial'].includes(invoice.status) && <button className="sales-primary-button" type="button" disabled={busy || accountsLoading || Boolean(accountsError)} onClick={openPayment}>Record payment</button>}
           {invoice.status === 'sent' && invoice.amountPaid === '0.00' && (
-            <button className="sales-danger-button" type="button" disabled={busy} onClick={() => {
-              if (window.confirm('Void this unpaid invoice? A reversing journal entry will be posted.')) runAction(() => voidInvoice(id))
-            }}>Void invoice</button>
+            <button className="sales-danger-button" type="button" disabled={busy} onClick={() => setVoidOpen(true)}>Void invoice</button>
           )}
           <button className="sales-secondary-button" type="button" onClick={() => window.print()}>Print</button>
         </div>
 
         <div className="invoice-detail__overview">
-          <div><span className="invoice-detail__label">Customer</span><strong>{invoice.customer.name}</strong><br /><span>{invoice.customer.email || ''}</span></div>
-          <div><span className="invoice-detail__label">Issue date</span><strong>{formatCalendarDate(invoice.issueDate)}</strong></div>
-          <div><span className="invoice-detail__label">Due date</span><strong>{formatCalendarDate(invoice.dueDate)}</strong></div>
+          <div><span className="invoice-detail__label">Bill to</span><strong>{invoice.customer.name}</strong><br /><span>{invoice.customer.email || ''}</span></div>
+          <div><span className="invoice-detail__label">Issued</span><strong>{formatCalendarDate(invoice.issueDate)}</strong></div>
+          <div><span className="invoice-detail__label">Due</span><strong>{formatCalendarDate(invoice.dueDate)}</strong></div>
           <div><span className="invoice-detail__label">Invoice number</span><strong>{invoice.invoiceNumber || 'Not assigned until sent'}</strong></div>
           <div><span className="invoice-detail__label">Amount paid</span><strong>{formatMoneyString(invoice.amountPaid)}</strong></div>
           <div><span className="invoice-detail__label">Outstanding</span><strong>{formatMoney(parseAmountToCents(invoice.total) - parseAmountToCents(invoice.amountPaid))}</strong></div>
@@ -166,14 +174,14 @@ function InvoiceDetail() {
         <section className="invoice-detail__section" aria-labelledby="invoice-detail-items-title">
           <h2 id="invoice-detail-items-title">Invoice items</h2>
           <div className="sales-table-scroll">
-            <table className="sales-table">
+            <table className="sales-table ledger-table">
               <thead><tr><th>Description</th><th>Revenue account</th><th>Quantity</th><th className="sales-table__money">Unit price</th><th className="sales-table__money">Tax</th><th className="sales-table__money">Line total</th></tr></thead>
               <tbody>{invoice.items.map((item) => (
                 <tr key={item.id}>
                   <td>{item.description}</td><td>{item.revenueAccountCode} — {item.revenueAccountName}</td><td>{item.quantity}</td>
-                  <td className="sales-table__money">{formatMoneyString(item.unitPrice)}</td>
-                  <td className="sales-table__money">{formatMoneyString(item.lineTax)}</td>
-                  <td className="sales-table__money">{formatMoneyString(item.lineTotal)}</td>
+                  <td className="sales-table__money num">{formatMoneyString(item.unitPrice)}</td>
+                  <td className="sales-table__money num">{formatMoneyString(item.lineTax)}</td>
+                  <td className="sales-table__money num">{formatMoneyString(item.lineTotal)}</td>
                 </tr>
               ))}</tbody>
             </table>
@@ -195,12 +203,12 @@ function InvoiceDetail() {
         </section>
         <section className="invoice-detail__section" aria-labelledby="invoice-payments-title">
           <h2 id="invoice-payments-title">Payments</h2>
-          {invoice.payments.length === 0 ? <p className="sales-muted">No payments recorded.</p> : (
-            <div className="sales-table-scroll"><table className="sales-table">
+          {invoice.payments.length === 0 ? <EmptyState title="No payments recorded." className="folio-empty-state--inline" /> : (
+            <div className="sales-table-scroll"><table className="sales-table ledger-table">
               <thead><tr><th>Date</th><th>Method</th><th>Reference</th><th className="sales-table__money">Amount</th><th>Journal entry</th></tr></thead>
               <tbody>{invoice.payments.map((payment) => <tr key={payment.id}>
                 <td>{formatCalendarDate(payment.paymentDate)}</td><td>{payment.method}</td><td>{payment.reference || '—'}</td>
-                <td className="sales-table__money">{formatMoneyString(payment.amount)}</td>
+                <td className="sales-table__money num">{formatMoneyString(payment.amount)}</td>
                 <td><Link className="sales-link" to={`/journal/${payment.journalEntryId}`}>View entry</Link></td>
               </tr>)}</tbody>
             </table></div>
@@ -208,10 +216,30 @@ function InvoiceDetail() {
         </section>
       </div>
 
+      {voidOpen && (
+        <Dialog open={voidOpen} onOpenChange={setVoidOpen}>
+          <DialogContent className="sales-dialog">
+            <DialogHeader>
+              <DialogTitle>Void invoice?</DialogTitle>
+              <DialogDescription>A reversing journal entry will be posted. The original invoice and its journal entry will remain in the records.</DialogDescription>
+            </DialogHeader>
+            <div className="sales-dialog__actions">
+              <button className="sales-secondary-button" type="button" disabled={busy} onClick={() => setVoidOpen(false)}>Cancel</button>
+              <button className="sales-danger-button" type="button" disabled={busy} onClick={() => {
+                setVoidOpen(false)
+                runAction(() => voidInvoice(id))
+              }}>{busy ? 'Voiding...' : 'Confirm void'}</button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
       {paymentOpen && (
-        <div className="sales-dialog-backdrop" role="presentation">
-          <section className="sales-dialog" role="dialog" aria-modal="true" aria-labelledby="record-payment-title">
-            <h2 id="record-payment-title">Record payment</h2>
+        <Dialog open={paymentOpen} onOpenChange={(open) => { if (!busy) setPaymentOpen(open) }}>
+          <DialogContent className="sales-dialog">
+            <DialogHeader>
+              <DialogTitle>Record payment</DialogTitle>
+              <DialogDescription>Enter the date, amount, and deposit account for this payment.</DialogDescription>
+            </DialogHeader>
             {actionError && <p className="sales-error-summary" role="alert">{actionError}</p>}
             <form onSubmit={submitPayment}>
               <div className="sales-form-grid">
@@ -226,8 +254,8 @@ function InvoiceDetail() {
                 <button className="sales-primary-button" type="submit" disabled={busy}>{busy ? 'Saving...' : 'Save payment'}</button>
               </div>
             </form>
-          </section>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
     </section>
   )

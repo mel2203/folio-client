@@ -1,12 +1,9 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
+import LoadingState from './LoadingState.jsx'
 
 function AuthLoading() {
-  return (
-    <main className="auth-loading" role="status" aria-live="polite">
-      Checking your session...
-    </main>
-  )
+  return <main className="auth-loading"><LoadingState label="Checking your session..." /></main>
 }
 
 export function ProtectedRoute() {

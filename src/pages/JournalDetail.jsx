@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { getJournalEntry } from '../api/journal.js'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
+import PageHeader from '../components/PageHeader.jsx'
+import Panel from '../components/Panel.jsx'
 import StatusChip from '../components/StatusChip.jsx'
 import { formatMoney, parseAmountToCents } from '../utils/money.js'
 import { formatCalendarDate } from '../utils/calendar-date.js'
@@ -64,18 +68,14 @@ function JournalDetail() {
   }, [id])
 
   if (isLoading) {
-    return (
-      <p className="journal-state" role="status" aria-live="polite">
-        Loading journal entry...
-      </p>
-    )
+    return <LoadingState label="Loading journal entry..." className="journal-state" />
   }
 
   if (error?.status === 404) {
     return (
       <section className="journal-detail">
         <Link className="journal-detail__back" to={backTo}>Back to journal entries</Link>
-        <p className="journal-state">Journal entry not found.</p>
+        <EmptyState title="Journal entry not found." className="journal-state" />
       </section>
     )
   }
@@ -100,30 +100,28 @@ function JournalDetail() {
   return (
     <section className="journal-detail">
       <Link className="journal-detail__back" to={backTo}>Back to journal entries</Link>
-      <header className="journal-detail__header">
-        <div>
-          <h1>Journal entry</h1>
-          <p><time dateTime={entry.entry_date}>{formatCalendarDate(entry.entry_date)}</time></p>
-        </div>
+      <PageHeader
+        className="journal-detail__header"
+        title="Journal entry"
+        sub={<time dateTime={entry.entry_date}>{formatCalendarDate(entry.entry_date)}</time>}
+      >
         <StatusChip tone={entry.status === 'posted' ? 'positive' : 'error'}>
           {entry.status}
         </StatusChip>
-      </header>
+      </PageHeader>
       {successMessage && (
         <p className="journal-detail__success" role="status" aria-live="polite">
           {successMessage}
         </p>
       )}
 
-      <section className="journal-detail-card" aria-labelledby="entry-memo-heading">
-        <h2 id="entry-memo-heading">Memo</h2>
+      <Panel className="journal-detail-card" title="Memo">
         <p className="journal-detail__memo">{entry.memo || 'No memo'}</p>
-      </section>
+      </Panel>
 
-      <section className="journal-detail-card journal-detail-card--lines" aria-labelledby="entry-lines-heading">
-        <h2 id="entry-lines-heading">Journal lines</h2>
+      <Panel className="journal-detail-card journal-detail-card--lines" title="Journal lines">
         <div className="journal-detail-table-scroll">
-          <table className="journal-detail-table">
+          <table className="journal-detail-table ledger-table">
             <thead>
               <tr>
                 <th scope="col">Account</th>
@@ -135,9 +133,9 @@ function JournalDetail() {
             <tbody>
               {entry.lines.map((line) => (
                 <tr key={line.id}>
-                  <td>{line.accountCode} — {line.accountName}</td>
-                  <td className="money">{formatMoney(parseAmountToCents(line.debit))}</td>
-                  <td className="money">{formatMoney(parseAmountToCents(line.credit))}</td>
+                  <td className={parseAmountToCents(line.credit) > 0n ? 'journal-detail-table__credit' : ''}>{line.accountCode} — {line.accountName}</td>
+                  <td className="money num">{formatMoney(parseAmountToCents(line.debit))}</td>
+                  <td className="money num">{formatMoney(parseAmountToCents(line.credit))}</td>
                   <td>{line.description || '—'}</td>
                 </tr>
               ))}
@@ -145,8 +143,8 @@ function JournalDetail() {
             <tfoot>
               <tr>
                 <td>Total</td>
-                <td className="money">{formatMoney(totals.debits)}</td>
-                <td className="money">{formatMoney(totals.credits)}</td>
+                <td className="money num">{formatMoney(totals.debits)}</td>
+                <td className="money num">{formatMoney(totals.credits)}</td>
                 <td />
               </tr>
             </tfoot>
@@ -157,7 +155,7 @@ function JournalDetail() {
             {isBalanced ? 'Debits = Credits' : 'Debits do not equal credits'}
           </StatusChip>
         </div>
-      </section>
+      </Panel>
     </section>
   )
 }

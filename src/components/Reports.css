@@ -2,53 +2,161 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 24px;
-  border-bottom: 1px solid var(--rule);
 }
 
 .reports-subnav__links {
   display: flex;
-  gap: 6px;
+  min-width: 0;
+  gap: 4px;
   overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  background: var(--muted);
+  scrollbar-width: thin;
 }
 
-.reports-subnav__links a {
+.reports-subnav__link {
+  display: inline-flex;
+  min-height: 34px;
   flex: 0 0 auto;
-  border-bottom: 3px solid transparent;
-  padding: 12px 14px;
-  color: var(--text-muted);
-  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 7px 14px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  font-weight: 500;
   text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
-.reports-subnav__links a:hover,
-.reports-subnav__links a[aria-current='page'] {
-  color: var(--navy);
+.reports-subnav__link:hover {
+  color: var(--foreground);
 }
 
-.reports-subnav__links a[aria-current='page'] {
-  border-bottom-color: var(--violet);
+.reports-subnav__link[aria-current='page'] {
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: 0 1px 3px rgba(20, 15, 61, 0.1);
 }
 
 .reports-print-button {
-  min-height: 40px;
+  min-height: 38px;
   flex: 0 0 auto;
-  border: 1.5px solid var(--navy);
-  border-radius: 99px;
-  padding: 8px 16px;
-  background: transparent;
-  color: var(--navy);
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.reports-print-button:hover {
-  background: var(--lilac);
+  border-color: var(--input);
+  padding-inline: 16px;
 }
 
 .reports-print-header {
   display: none;
+}
+
+.reports-date-control {
+  display: grid;
+  min-width: 160px;
+  gap: 6px;
+}
+
+.reports-date-control .field {
+  width: 100%;
+}
+
+.reports-state,
+.sales-page .reports-state {
+  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: var(--shadow-soft);
+}
+
+.sales-page .sales-state--error {
+  border-left: 4px solid var(--destructive);
+  color: var(--foreground);
+}
+
+.aging-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 0 0 16px;
+}
+
+.ar-aging-page .status-chip--positive,
+.ap-aging-page .status-chip--positive {
+  background: color-mix(in srgb, var(--success) 16%, var(--card));
+  color: var(--success-text);
+}
+
+.ar-aging-page .status-chip--error,
+.ap-aging-page .status-chip--error {
+  border-color: var(--destructive);
+  background: color-mix(in srgb, var(--destructive) 12%, var(--card));
+  color: var(--destructive-text);
+}
+
+.sales-page .reports-aging-card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+}
+
+.reports-aging-card .sales-table {
+  min-width: 760px;
+  font-size: 13px;
+}
+
+.reports-aging-card .sales-table th {
+  border-bottom: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.reports-aging-card .sales-table td {
+  border-bottom: 1px dashed var(--border);
+  color: var(--foreground);
+}
+
+.reports-aging-card .sales-table__money {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.reports-aging-card .invoice-preview__total th,
+.reports-aging-card .invoice-preview__total td {
+  border-top: 1px solid var(--foreground);
+  border-bottom: 3px double var(--foreground);
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .reports-page__header {
+    align-items: stretch;
+  }
+
+  .reports-subnav {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .reports-print-button {
+    align-self: flex-end;
+  }
 }
 
 @media print {
@@ -60,20 +168,14 @@
   #root {
     min-width: 0;
     min-height: 0;
-    background: var(--white);
-    color: var(--navy);
+    background: #FFFFFF;
+    color: #140F3D;
   }
 
   .sidebar,
   .topbar,
   .reports-subnav,
-  .trial-balance-page__header,
-  .income-statement-page__header,
-  .balance-sheet-page__header {
-    display: none !important;
-  }
-
-  .ar-aging-page__header {
+  .reports-page__header {
     display: none !important;
   }
 
@@ -104,29 +206,35 @@
 
   .trial-balance-card,
   .income-statement-card,
-  .balance-sheet-card,
+  .balance-sheet-section,
+  .reports-aging-card,
   .trial-balance-state,
   .income-statement-state,
-  .balance-sheet-state {
-    box-shadow: none;
+  .balance-sheet-state,
+  .reports-state {
+    box-shadow: none !important;
   }
 
   .trial-balance-table,
   .income-statement-table,
-  .balance-sheet-table {
+  .balance-sheet-table,
+  .reports-aging-card table {
     break-inside: avoid;
   }
 
   tr,
   .income-statement-section,
-  .balance-sheet-section {
+  .balance-sheet-section,
+  .reports-aging-card {
     break-inside: avoid;
   }
 
-  .trial-balance-table__grand-total th,
-  .trial-balance-table__grand-total td,
+  .trial-balance-table tfoot th,
+  .trial-balance-table tfoot td,
   .income-statement-grand-total,
-  .balance-sheet-grand-total {
+  .balance-sheet-grand-total,
+  .reports-aging-card .invoice-preview__total th,
+  .reports-aging-card .invoice-preview__total td {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }

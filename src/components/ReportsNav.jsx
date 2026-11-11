@@ -1,20 +1,38 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
+import { Button } from './ui/button.jsx'
+
+const REPORTS = [
+  ['/reports/trial-balance', 'Trial Balance'],
+  ['/reports/income-statement', 'Profit and Loss'],
+  ['/reports/balance-sheet', 'Balance Sheet'],
+  ['/reports/ar-aging', 'A/R Aging'],
+  ['/reports/ap-aging', 'A/P Aging'],
+]
 
 function ReportsNav() {
+  const location = useLocation()
+
   function printReport() {
     window.print()
   }
 
   return (
     <nav className="reports-subnav" aria-label="Report types">
-      <div className="reports-subnav__links">
-        <NavLink end to="/reports/trial-balance">Trial Balance</NavLink>
-        <NavLink end to="/reports/income-statement">Profit and Loss</NavLink>
-        <NavLink end to="/reports/balance-sheet">Balance Sheet</NavLink>
-        <NavLink end to="/reports/ar-aging">A/R Aging</NavLink>
-        <NavLink end to="/reports/ap-aging">A/P Aging</NavLink>
+      <div className="reports-subnav__links" role="group" aria-label="Reports">
+        {REPORTS.map(([path, label]) => (
+          <NavLink
+            className="reports-subnav__link"
+            end
+            key={path}
+            to={`${path}${location.search}`}
+          >
+            {label}
+          </NavLink>
+        ))}
       </div>
-      <button className="reports-print-button" type="button" onClick={printReport}>Print</button>
+      <Button className="reports-print-button" type="button" variant="outline" onClick={printReport}>
+        Print
+      </Button>
     </nav>
   )
 }

@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { createCustomer, listCustomers, updateCustomer } from '../api/sales.js'
 import { createVendor, listVendors, updateVendor } from '../api/purchases.js'
+import EmptyState from '../components/EmptyState.jsx'
+import LoadingState from '../components/LoadingState.jsx'
 import Pagination from '../components/Pagination.jsx'
+import PageHeader from '../components/PageHeader.jsx'
+import Panel from '../components/Panel.jsx'
+import { Button } from '../components/ui/button.jsx'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog.jsx'
 import '../components/Sales.css'
 
 const PAGE_SIZE = 20
@@ -140,29 +146,28 @@ function ContactDirectoryPage({ kind = 'customer' }) {
 
   return (
     <section className="sales-page customers-page">
-      <header className="sales-page__header">
-        <div><h1>{title}</h1><p>Manage {entity} contact details and payment terms.</p></div>
-        <button className="sales-primary-button" type="button" onClick={openCreate}>Add {entity}</button>
-      </header>
+      <PageHeader title={title} sub={`Manage ${entity} contact details and payment terms.`}>
+        <Button type="button" onClick={openCreate}>Add {entity}</Button>
+      </PageHeader>
 
       <form className="sales-filters" onSubmit={applyFilters} key={requestKey}>
-        <label className="sales-field">Search<input name="search" defaultValue={search} placeholder="Name or email" /></label>
+        <label className="sales-field">Search<input className="field" name="search" defaultValue={search} placeholder="Name or email" /></label>
         <label className="sales-field">Status
-          <select name="active" defaultValue={active}>
+          <select className="field" name="active" defaultValue={active}>
             <option value="">All {plural}</option><option value="true">Active</option><option value="false">Inactive</option>
           </select>
         </label>
-        <button className="sales-secondary-button" type="submit">Apply filters</button>
+        <Button className="sales-secondary-button" type="submit" variant="outline">Apply filters</Button>
       </form>
 
       {actionError && !modalOpen && <p className="sales-state sales-state--error" role="alert">{actionError}</p>}
-      {loading && <p className="sales-state" role="status" aria-live="polite">Loading {plural}...</p>}
+      {loading && <LoadingState label={`Loading ${plural}...`} className="sales-state" />}
       {!loading && current.error && <p className="sales-state sales-state--error" role="alert">Error: {current.error}</p>}
-      {!loading && !current.error && current.data.length === 0 && <p className="sales-state">No {plural} found.</p>}
+      {!loading && !current.error && current.data.length === 0 && <EmptyState title={`No ${plural} found.`} className="sales-state" />}
       {!loading && !current.error && current.data.length > 0 && (
-        <div className="sales-card">
+        <Panel className="sales-card sales-table-panel">
           <div className="sales-table-scroll">
-            <table className="sales-table">
+            <table className="sales-table ledger-table">
               <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Terms</th><th>Status</th><th><span className="visually-hidden">Actions</span></th></tr></thead>
               <tbody>
                 {current.data.map((customer) => (
@@ -170,12 +175,12 @@ function ContactDirectoryPage({ kind = 'customer' }) {
                     <td>{customer.name}</td><td>{customer.email || '—'}</td><td>{customer.phone || '—'}</td>
                     <td>{customer.paymentTermsDays} days</td><td>{customer.isActive ? 'Active' : 'Inactive'}</td>
                     <td><div className="sales-actions">
-                      <button className="sales-secondary-button" type="button" onClick={() => openEdit(customer)}>Edit</button>
-                      <button className="sales-secondary-button" type="button" disabled={pendingContactIds.has(customer.id)} onClick={() => toggleActive(customer)}>
+                      <Button className="sales-secondary-button" type="button" variant="outline" size="sm" onClick={() => openEdit(customer)}>Edit</Button>
+                      <Button className="sales-secondary-button" type="button" variant="outline" size="sm" disabled={pendingContactIds.has(customer.id)} onClick={() => toggleActive(customer)}>
                         {pendingContactIds.has(customer.id)
                           ? customer.isActive ? 'Deactivating...' : 'Reactivating...'
                           : customer.isActive ? 'Deactivate' : 'Reactivate'}
-                      </button>
+                      </Button>
                     </div></td>
                   </tr>
                 ))}
@@ -183,34 +188,35 @@ function ContactDirectoryPage({ kind = 'customer' }) {
             </table>
           </div>
           <Pagination page={current.meta.page} limit={current.meta.limit} total={current.meta.total} onPageChange={changePage} ariaLabel={`${title} pagination`} />
-        </div>
+        </Panel>
       )}
 
-      {modalOpen && (
-        <div className="sales-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !saving) setModalOpen(false) }}>
-          <section className="sales-dialog" role="dialog" aria-modal="true" aria-labelledby="contact-form-title">
-            <h2 id="contact-form-title">{editing ? `Edit ${entity}` : `Add ${entity}`}</h2>
+      <Dialog open={modalOpen} onOpenChange={(open) => { if (!saving) setModalOpen(open) }}>
+        <DialogContent className="sales-dialog">
+          <DialogHeader>
+            <DialogTitle>{editing ? `Edit ${entity}` : `Add ${entity}`}</DialogTitle>
+            <DialogDescription>Enter the {entity} contact details and payment terms.</DialogDescription>
+          </DialogHeader>
             {actionError && <p className="sales-error-summary" role="alert">{actionError}</p>}
             <form onSubmit={submit}>
               <div className="sales-form-grid">
                 <label className="sales-field sales-field--wide">Name
-                  <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} aria-invalid={Boolean(fieldError && !form.name.trim())} />
+                  <input className="field" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} aria-invalid={Boolean(fieldError && !form.name.trim())} />
                   {fieldError && !form.name.trim() && <span className="sales-inline-error">{fieldError}</span>}
                 </label>
-                <label className="sales-field">Email<input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label>
-                <label className="sales-field">Phone<input value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} /></label>
-                <label className="sales-field">Payment terms (days)<input type="number" min="0" max="3650" value={form.paymentTermsDays} onChange={(event) => setForm({ ...form, paymentTermsDays: event.target.value })} /></label>
-                <label className="sales-field sales-field--wide">Address<textarea value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} /></label>
+                <label className="sales-field">Email<input className="field" type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></label>
+                <label className="sales-field">Phone<input className="field" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} /></label>
+                <label className="sales-field">Payment terms (days)<input className="field" type="number" min="0" max="3650" value={form.paymentTermsDays} onChange={(event) => setForm({ ...form, paymentTermsDays: event.target.value })} /></label>
+                <label className="sales-field sales-field--wide">Address<textarea className="field" value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} /></label>
               </div>
               {fieldError && form.name.trim() && <p className="sales-inline-error" role="alert">{fieldError}</p>}
               <div className="sales-dialog__actions">
-                <button className="sales-secondary-button" type="button" disabled={saving} onClick={() => setModalOpen(false)}>Cancel</button>
-                <button className="sales-primary-button" type="submit" disabled={saving}>{saving ? 'Saving...' : `Save ${entity}`}</button>
+                <Button className="sales-secondary-button" type="button" variant="outline" disabled={saving} onClick={() => setModalOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={saving}>{saving ? 'Saving...' : `Save ${entity}`}</Button>
               </div>
             </form>
-          </section>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }
