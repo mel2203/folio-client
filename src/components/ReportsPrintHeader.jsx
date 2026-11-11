@@ -7,6 +7,7 @@ const REPORT_TITLES = {
   '/reports/income-statement': 'Profit and Loss',
   '/reports/balance-sheet': 'Balance Sheet',
   '/reports/ar-aging': 'Accounts Receivable Aging',
+  '/reports/ap-aging': 'Accounts Payable Aging',
 }
 
 function ReportsPrintHeader() {

@@ -24,3 +24,7 @@ export function getBalanceSheet({ asOf } = {}) {
 export function getArAging({ asOf } = {}) {
   return request(withQuery('/api/reports/ar-aging', { asOf }))
 }
+
+export function getApAging({ asOf } = {}) {
+  return request(withQuery('/api/reports/ap-aging', { asOf }))
+}

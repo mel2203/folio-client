@@ -16,6 +16,11 @@ import TrialBalance from './pages/TrialBalance.jsx'
 import Login from './pages/Login.jsx'
 import NotFound from './pages/NotFound.jsx'
 import Register from './pages/Register.jsx'
+import Vendors from './pages/Vendors.jsx'
+import Bills from './pages/Bills.jsx'
+import BillForm from './pages/BillForm.jsx'
+import BillDetail from './pages/BillDetail.jsx'
+import ApAging from './pages/ApAging.jsx'
 
 function App() {
   return (
@@ -37,11 +42,17 @@ function App() {
             <Route path="/invoices/new" element={<InvoiceForm />} />
             <Route path="/invoices/:id/edit" element={<InvoiceForm />} />
             <Route path="/invoices/:id" element={<InvoiceDetail />} />
+            <Route path="/vendors" element={<Vendors />} />
+            <Route path="/bills" element={<Bills />} />
+            <Route path="/bills/new" element={<BillForm />} />
+            <Route path="/bills/:id/edit" element={<BillForm />} />
+            <Route path="/bills/:id" element={<BillDetail />} />
             <Route path="/reports" element={<Navigate to="/reports/trial-balance" replace />} />
             <Route path="/reports/trial-balance" element={<TrialBalance />} />
             <Route path="/reports/income-statement" element={<IncomeStatement />} />
             <Route path="/reports/balance-sheet" element={<BalanceSheet />} />
             <Route path="/reports/ar-aging" element={<ArAging />} />
+            <Route path="/reports/ap-aging" element={<ApAging />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

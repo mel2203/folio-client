@@ -12,6 +12,7 @@ function ReportsNav() {
         <NavLink end to="/reports/income-statement">Profit and Loss</NavLink>
         <NavLink end to="/reports/balance-sheet">Balance Sheet</NavLink>
         <NavLink end to="/reports/ar-aging">A/R Aging</NavLink>
+        <NavLink end to="/reports/ap-aging">A/P Aging</NavLink>
       </div>
       <button className="reports-print-button" type="button" onClick={printReport}>Print</button>
     </nav>

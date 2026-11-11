@@ -42,6 +42,11 @@ function Sidebar() {
             Invoices
           </NavLink>
         </div>
+        <div className="sidebar__section" aria-label="Purchases">
+          <span className="sidebar__section-title">Purchases</span>
+          <NavLink className={({ isActive }) => `sidebar__link sidebar__link--nested${isActive ? ' is-active' : ''}`} to="/vendors">Vendors</NavLink>
+          <NavLink className={({ isActive }) => `sidebar__link sidebar__link--nested${isActive ? ' is-active' : ''}`} to="/bills">Bills</NavLink>
+        </div>
       </nav>
     </aside>
   )

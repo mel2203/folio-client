@@ -17,6 +17,7 @@
 .sales-status--partial { background: var(--sun); }
 .sales-status--paid { background: var(--mint); }
 .sales-status--void { border-color: var(--coral); background: var(--white); }
+.sales-status--open { background: var(--violet); color: var(--white); }
 
 .sales-overdue {
   display: inline-block;
