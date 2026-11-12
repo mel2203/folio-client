@@ -49,7 +49,7 @@ The dashboard uses the backend's `GET /api/dashboard/summary` response for its s
 
 ## Screenshots
 
-- Dashboard: ![Dashboard View] (FolioDashboard.png)
+- Dashboard: ![Dashboard View] (public/FolioDashboard.png)
 - Invoices: ![Invoices View] (FolioInvoices.png)
 - Reports: ![FolioReports] (FolioReports.png)
   
