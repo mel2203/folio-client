@@ -49,14 +49,17 @@ The dashboard uses the backend's `GET /api/dashboard/summary` response for its s
 
 ## Screenshots
 
-- Dashboard: _Screenshot placeholder — add after deployment._
-- Invoices: _Screenshot placeholder — add after deployment._
-- Reports: _Screenshot placeholder — add after deployment._
-
+- Dashboard: ![Dashboard View] (FolioDashboard.png)
+- Invoices: ![Invoices View] (FolioInvoices.png)
+- Reports: ![FolioReports] (FolioReports.png)
+  
 ## Live links
 
-- Frontend: Not published.
-- Backend API: Not published.
+- Frontend: https://folio-frontend-xi.vercel.app/login
+- Backend API: https://railway.com/project/13c33e2f-bfcf-4f7a-b85d-e0778254fe97/service/f6fdcd65-2c4f-47f6-93a1-ae1f172b37fd?environmentId=f7c18c16-c548-4780-9f4f-2df87b66483b
+
+- Demo Email : demo@gmail.com
+- Password : password12345
 
 ## Tests
 
